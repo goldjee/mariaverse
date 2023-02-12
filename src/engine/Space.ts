@@ -11,11 +11,11 @@ const GRID_SIZE_X = 18000; // size in units
 const GRID_SIZE_Y = 8000;
 
 const PARTICLE_COUNT_MIN = 200;
-const PARTICLE_COUNT_MAX = 200;
+const PARTICLE_COUNT_MAX = 250;
 
-const VELOCITY_MIN = 0;
-const VELOCITY_MAX = 0;
 export const VELOCITY_CAP = 700;
+const VELOCITY_MAX = VELOCITY_CAP / 4;
+
 export const ENERGY_DISSIPATION = 1e-5;
 
 const SLOWMO_FACTOR = 1e-2;
@@ -72,8 +72,8 @@ class Space {
 
         if (!velocity)
             velocity = {
-                x: Math.random() * (VELOCITY_MAX - VELOCITY_MIN) + VELOCITY_MIN,
-                y: Math.random() * (VELOCITY_MAX - VELOCITY_MIN) + VELOCITY_MIN,
+                x: VELOCITY_MAX * (Math.random() * 2 - 1),
+                y: VELOCITY_MAX * (Math.random() * 2 - 1),
             } as Vector;
 
         this.particles.push(new Particle(type, position, velocity));
@@ -133,7 +133,7 @@ function getForce(
     const r = subtract(particle1.position, particle2.position);
     const d = modulus(r);
 
-    if (d > 0 && d <= 2000) {
+    if (d > 0 && d <= 1000) {
         const affinityA = particle1.getAffinity(particle2.type);
         const affinityB = particle2.getAffinity(particle1.type);
 

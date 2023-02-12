@@ -1,7 +1,13 @@
 import { ENERGY_DISSIPATION, VELOCITY_CAP } from './Space';
 import Vector, * as vector from './Vector';
 
-export const particleTypes = ['green', 'red', 'grey', 'blue', 'cyan', 'magenta', 'yellow'];
+export const particleTypes = [
+    'green',
+    'red',
+    'yellow',
+    'blue',
+    'cyan',
+];
 export type ParticleType = typeof particleTypes[number];
 
 export class Particle {
@@ -63,11 +69,15 @@ export class Particle {
     }
 }
 
+const MIN_MASS = 0.1;
+const MAX_MASS = 1.5;
 const MASSES: Map<ParticleType, number> = new Map<ParticleType, number>();
 particleTypes.forEach((type) => {
-    MASSES.set(type, Math.random());
+    MASSES.set(type, Math.random() * (MAX_MASS - MIN_MASS) + MIN_MASS);
 });
 
+const MIN_AFFINITY = -10;
+const MAX_AFFINITY = 10;
 const AFFINITIES: Map<ParticleType, Map<ParticleType, number>> = new Map<
     ParticleType,
     Map<ParticleType, number>
@@ -75,7 +85,10 @@ const AFFINITIES: Map<ParticleType, Map<ParticleType, number>> = new Map<
 particleTypes.forEach((typeA) => {
     const charges = new Map<ParticleType, number>();
     particleTypes.forEach((typeB) => {
-        charges.set(typeB, (Math.random() * 2 - 1) * 2);
+        charges.set(
+            typeB,
+            Math.random() * (MAX_AFFINITY - MIN_AFFINITY) + MIN_AFFINITY
+        );
     });
     AFFINITIES.set(typeA, charges);
 });
