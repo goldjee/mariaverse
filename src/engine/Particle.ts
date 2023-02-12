@@ -1,7 +1,7 @@
 import { ENERGY_DISSIPATION, VELOCITY_CAP } from './Space';
 import Vector, * as vector from './Vector';
 
-export const particleTypes = ['green', 'red', 'grey', 'blue'];
+export const particleTypes = ['green', 'red', 'grey', 'blue', 'cyan', 'magenta', 'yellow'];
 export type ParticleType = typeof particleTypes[number];
 
 export class Particle {
@@ -17,8 +17,12 @@ export class Particle {
         this.forces = [];
     }
 
-    public getCharge(type: ChargeType): number {
-        return CHARGES.get(this.type)?.get(type) || 0;
+    public getMass(): number {
+        return MASSES.get(this.type) || 0;
+    }
+
+    public getAffinity(type: ParticleType): number {
+        return AFFINITIES.get(this.type)?.get(type) || 0;
     }
 
     public reflect(direction: vector.Direction) {
@@ -31,7 +35,7 @@ export class Particle {
 
     public move(delta: number): void {
         const resultForce = vector.sum(...this.forces);
-        const mass = this.getCharge('mass');
+        const mass = this.getMass();
         const acceleration =
             mass !== 0 ? vector.multiply(resultForce, 1 / mass) : vector.ZERO;
 
@@ -59,22 +63,21 @@ export class Particle {
     }
 }
 
-export const chargeTypes = ['mass'];
-particleTypes.forEach((type1) => {
-    particleTypes.forEach((type2) => {
-        chargeTypes.push(`${type1}_${type2}`);
-    });
+const MASSES: Map<ParticleType, number> = new Map<ParticleType, number>();
+particleTypes.forEach((type) => {
+    MASSES.set(type, Math.random());
 });
-export type ChargeType = typeof chargeTypes[number];
 
-const CHARGES: Map<ParticleType, Map<ChargeType, number>> = new Map<
+const AFFINITIES: Map<ParticleType, Map<ParticleType, number>> = new Map<
     ParticleType,
-    Map<ChargeType, number>
+    Map<ParticleType, number>
 >();
-particleTypes.forEach((particleType) => {
-    const charges = new Map<ChargeType, number>();
-    chargeTypes.forEach((type) => {
-        charges.set(type, (Math.random() + type !== 'mass' ? - 1 : 0) * 3);
+particleTypes.forEach((typeA) => {
+    const charges = new Map<ParticleType, number>();
+    particleTypes.forEach((typeB) => {
+        charges.set(typeB, (Math.random() * 2 - 1) * 2);
     });
-    CHARGES.set(particleType, charges);
+    AFFINITIES.set(typeA, charges);
 });
+
+console.log(AFFINITIES);

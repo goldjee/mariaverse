@@ -1,6 +1,4 @@
 import {
-    ChargeType,
-    chargeTypes,
     Particle,
     ParticleType,
     particleTypes,
@@ -12,12 +10,12 @@ import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
 const GRID_SIZE_X = 18000; // size in units
 const GRID_SIZE_Y = 8000;
 
-const PARTICLE_COUNT_MIN = 100;
-const PARTICLE_COUNT_MAX = 100;
+const PARTICLE_COUNT_MIN = 200;
+const PARTICLE_COUNT_MAX = 200;
 
 const VELOCITY_MIN = 0;
 const VELOCITY_MAX = 0;
-export const VELOCITY_CAP = 1000;
+export const VELOCITY_CAP = 700;
 export const ENERGY_DISSIPATION = 1e-5;
 
 const SLOWMO_FACTOR = 1e-2;
@@ -90,7 +88,9 @@ class Space {
 
     public async update(delta: number): Promise<void> {
         if (this.isRunning) {
-            // console.log(delta);
+            console.log(
+                `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
+            );
             const executables: Promise<void>[] = [];
             this.particles.forEach((particle) => {
                 if (
@@ -114,16 +114,6 @@ class Space {
                     );
                 }
 
-                // this.particles
-                //     .filter((particle2) => particle2 !== particle)
-                //     .forEach((particle2) => {
-                //         chargeTypes.forEach((chargeType) => {
-                //             particle.applyForce(
-                //                 getForce(particle, particle2, chargeType)
-                //             );
-                //         });
-                //     });
-
                 executables.push(applyForceField(particle, this.particles));
             });
 
@@ -139,17 +129,16 @@ class Space {
 function getForce(
     particle1: Particle,
     particle2: Particle,
-    type: ChargeType
 ): Vector {
     const r = subtract(particle1.position, particle2.position);
     const d = modulus(r);
 
-    if (d > 0 && d <= 1000) {
-        const charge1 = particle1.getCharge(type);
-        const charge2 = particle2.getCharge(type);
+    if (d > 0 && d <= 2000) {
+        const affinityA = particle1.getAffinity(particle2.type);
+        const affinityB = particle2.getAffinity(particle1.type);
 
         const coefficient =
-            ((type === 'mass' ? -1 : 1) * charge1 * charge2) / d;
+            (affinityA * affinityB) / d;
         return multiply(r, coefficient);
     } else return ZERO;
 }
@@ -161,9 +150,7 @@ async function applyForceField(
     particles
         .filter((particle2) => particle2 !== probe)
         .forEach((particle2) => {
-            chargeTypes.forEach((chargeType) => {
-                probe.applyForce(getForce(probe, particle2, chargeType));
-            });
+            probe.applyForce(getForce(probe, particle2));
         });
 }
 
