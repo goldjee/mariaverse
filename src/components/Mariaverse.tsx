@@ -59,7 +59,7 @@ const Mariaverse: React.FC = () => {
             drawCircle(
                 context,
                 particle.position,
-                Math.abs(particle.getAffinity('mass') * 5),
+                Math.abs(particle.getMass() * 5),
                 particle.type
             );
         },

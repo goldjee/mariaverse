@@ -14,13 +14,13 @@ export class Particle {
     type: ParticleType;
     position: Vector;
     velocity: Vector;
-    forces: Vector[];
+    force: Vector;
 
     constructor(type: ParticleType, position: Vector, velocity: Vector) {
         this.type = type;
         this.position = position;
         this.velocity = velocity;
-        this.forces = [];
+        this.force = vector.ZERO;
     }
 
     public getMass(): number {
@@ -36,14 +36,13 @@ export class Particle {
     }
 
     public applyForce(force: Vector) {
-        this.forces.push(force);
+        this.force = vector.sum(this.force, force);
     }
 
     public move(delta: number): void {
-        const resultForce = vector.sum(...this.forces);
         const mass = this.getMass();
         const acceleration =
-            mass !== 0 ? vector.multiply(resultForce, 1 / mass) : vector.ZERO;
+            mass !== 0 ? vector.multiply(this.force, 1 / mass) : vector.ZERO;
 
         this.velocity = vector.sum(
             this.velocity,
@@ -65,7 +64,7 @@ export class Particle {
             vector.multiply(this.velocity, delta)
         );
 
-        this.forces = [];
+        this.force = vector.ZERO;
     }
 }
 

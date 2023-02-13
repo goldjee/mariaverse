@@ -1,8 +1,4 @@
-import {
-    Particle,
-    ParticleType,
-    particleTypes,
-} from './Particle';
+import { Particle, ParticleType, particleTypes } from './Particle';
 import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
@@ -10,15 +6,18 @@ import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
 const GRID_SIZE_X = 18000; // size in units
 const GRID_SIZE_Y = 8000;
 
-const PARTICLE_COUNT_MIN = 200;
-const PARTICLE_COUNT_MAX = 250;
+const PARTICLE_COUNT_MIN = 300;
+const PARTICLE_COUNT_MAX = 300;
 
-export const VELOCITY_CAP = 700;
-const VELOCITY_MAX = VELOCITY_CAP / 4;
+export const VELOCITY_CAP = 2700;
+const VELOCITY_MAX = VELOCITY_CAP / 40;
+
+const FORCE_DISTANCE_LIMIT = 1500;
+const ALLOW_ASYMMETRIC_INTERACTIONS = true;
 
 export const ENERGY_DISSIPATION = 1e-5;
 
-const SLOWMO_FACTOR = 1e-2;
+const SLOWMO_FACTOR = 1e-3;
 
 const debug = false;
 
@@ -126,19 +125,21 @@ class Space {
     }
 }
 
-function getForce(
-    particle1: Particle,
-    particle2: Particle,
-): Vector {
+function getForce(particle1: Particle, particle2: Particle): Vector {
     const r = subtract(particle1.position, particle2.position);
     const d = modulus(r);
 
-    if (d > 0 && d <= 1000) {
+    if (d > 0 && d <= FORCE_DISTANCE_LIMIT) {
+        let coefficient = 0;
         const affinityA = particle1.getAffinity(particle2.type);
-        const affinityB = particle2.getAffinity(particle1.type);
 
-        const coefficient =
-            (affinityA * affinityB) / d;
+        if (ALLOW_ASYMMETRIC_INTERACTIONS)
+            coefficient = Math.sign(affinityA) * Math.abs(affinityA * affinityA) / d;
+        else {
+            const affinityB = particle2.getAffinity(particle1.type);
+            coefficient = affinityA * affinityB / d;
+        }
+
         return multiply(r, coefficient);
     } else return ZERO;
 }
@@ -148,7 +149,11 @@ async function applyForceField(
     particles: Particle[]
 ): Promise<void> {
     particles
-        .filter((particle2) => particle2 !== probe)
+        .filter((particle2) => {
+            const r = subtract(probe.position, particle2.position);
+            const d = modulus(r);
+            return particle2 !== probe && d > 0 && d <= FORCE_DISTANCE_LIMIT;
+        })
         .forEach((particle2) => {
             probe.applyForce(getForce(probe, particle2));
         });
