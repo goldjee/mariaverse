@@ -24,15 +24,15 @@ const Mariaverse: React.FC = observer(() => {
     const setCanvasDimensions = useCallback(() => {
         if (parent.current) {
             const w = parent.current['offsetWidth'];
-            const h = parent.current['offsetHeight'];
-            const scaleFactor = Math.max(w / spaceStore.getConfig().sizeX, h / spaceStore.getConfig().sizeY);
+            // const h = parent.current['offsetHeight'];
+            const scaleFactor = w / spaceStore.getConfig().sizeX;
             setScale(scaleFactor);
             setSize({
                 width: spaceStore.getConfig().sizeX * scaleFactor,
                 height: spaceStore.getConfig().sizeY * scaleFactor,
             });
         }
-    }, [spaceStore.getConfig().sizeX, spaceStore.getConfig().sizeY]);
+    }, [spaceStore.getConfig().sizeX, parent.current]);
 
     const drawCircle = useCallback(
         (
