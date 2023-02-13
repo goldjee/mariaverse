@@ -110,9 +110,9 @@ class Space {
 
     public async update(delta: number): Promise<void> {
         if (this.isRunning) {
-            console.log(
-                `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
-            );
+            // console.log(
+            //     `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
+            // );
             const executables: Promise<void>[] = [];
             this.particles.forEach((particle) => {
                 if (

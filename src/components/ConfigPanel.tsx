@@ -243,7 +243,7 @@ const ConfigPanel: React.FC = observer(() => {
                             </Tooltip>
                         </Group>
                         {particleProperties.map((properties) => (
-                            <Stack id={properties.type}>
+                            <Stack key={properties.type}>
                                 <Title order={6}>{properties.type}</Title>
                                 <ConfigEntry label="Масса">
                                     <Text>{properties.mass.toFixed(6)}</Text>
@@ -251,7 +251,7 @@ const ConfigPanel: React.FC = observer(() => {
                                 {properties.affinities.map((affinity) => (
                                     <ConfigEntry
                                         label={`${properties.type} → ${affinity.type}`}
-                                        id={`${properties.type} -> ${affinity.type}`}
+                                        key={`${properties.type} -> ${affinity.type}`}
                                     >
                                         <Text>
                                             {affinity.affinity.toFixed(6)}

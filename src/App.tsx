@@ -29,13 +29,13 @@ const App: React.FC = () => {
                 }
             >
                 <Grid h="100%">
-                    <Grid.Col span={8}>
+                    <Grid.Col lg={8} md={12}>
                         <Stack h="100%">
                             <Mariaverse />
                             <About />
                         </Stack>
                     </Grid.Col>
-                    <Grid.Col span={4}>
+                    <Grid.Col lg={4} md={12}>
                         <ConfigPanel />
                     </Grid.Col>
                 </Grid>
