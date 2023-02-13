@@ -30,7 +30,7 @@ const App: React.FC = () => {
             >
                 <Grid h="100%">
                     <Grid.Col lg={8} md={12}>
-                        <Stack h="100%">
+                        <Stack>
                             <Mariaverse />
                             <About />
                         </Stack>

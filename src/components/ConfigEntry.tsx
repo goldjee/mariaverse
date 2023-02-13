@@ -1,4 +1,4 @@
-import { Box, Flex, FlexProps, Text } from '@mantine/core';
+import { Box, FlexProps, Group, Text } from '@mantine/core';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -6,14 +6,16 @@ interface Props {
     children: ReactNode;
 }
 
-const ConfigEntry: React.FC<Props & FlexProps> = ({ label, children, ...rest }) => {
+const ConfigEntry: React.FC<Props & FlexProps> = ({
+    label,
+    children,
+    ...rest
+}) => {
     return (
-        <Flex w={rest.w || '100%'} direction="row" justify="flex-start" align="center">
+        <Group w={rest.w || '100%'} position="apart" grow>
             <Text w="40%">{label}</Text>
-            <Box w="60%">
-                {children}
-            </Box>
-        </Flex>
+            <Box w="60%">{children}</Box>
+        </Group>
     );
 };
 
