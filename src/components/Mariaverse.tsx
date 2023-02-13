@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import { Particle } from '../engine/Particle';
-import Space from '../engine/Space';
 import Vector from '../engine/Vector';
+import { useStore } from '../stores/stores';
 
 /*
     Thanks, good sir at https://javascript.plainenglish.io/smooth-animations-for-interactive-html-canvas-simulations-with-react-b6fc1109ecd7
     who made it all possible.
 */
 
-const Mariaverse: React.FC = () => {
-    const [space] = useState(new Space());
+const Mariaverse: React.FC = observer(() => {
+    const { spaceStore } = useStore();
     const parent = useRef(null);
     const [size, setSize] = useState({
         width: 0,
@@ -24,14 +25,14 @@ const Mariaverse: React.FC = () => {
         if (parent.current) {
             const w = parent.current['offsetWidth'];
             const h = parent.current['offsetHeight'];
-            const scaleFactor = Math.min(w / space.getConfig().sizeX, h / space.getConfig().sizeY);
+            const scaleFactor = Math.min(w / spaceStore.getConfig().sizeX, h / spaceStore.getConfig().sizeY);
             setScale(scaleFactor);
             setSize({
-                width: space.getConfig().sizeX * scaleFactor,
-                height: space.getConfig().sizeY * scaleFactor,
+                width: spaceStore.getConfig().sizeX * scaleFactor,
+                height: spaceStore.getConfig().sizeY * scaleFactor,
             });
         }
-    }, [space.getConfig().sizeX, space.getConfig().sizeY]);
+    }, [spaceStore.getConfig().sizeX, spaceStore.getConfig().sizeY]);
 
     const drawCircle = useCallback(
         (
@@ -82,18 +83,18 @@ const Mariaverse: React.FC = () => {
             const timeNow = Date.now();
             const deltaTime = timeNow - lastRenderTimeRef.current;
 
-            void space.update(deltaTime);
+            void spaceStore.space.update(deltaTime);
 
             // rendering
             clearBackground(context);
-            space.particles.map((particle) => {
+            spaceStore.space.particles.map((particle) => {
                 drawParticle(context, particle);
             });
 
             lastRenderTimeRef.current = timeNow;
         }
         animationFrameRequestRef.current = requestAnimationFrame(renderFrame);
-    }, [clearBackground, drawParticle, space]);
+    }, [clearBackground, drawParticle, spaceStore.space]);
 
     useEffect(() => {
         setCanvasDimensions();
@@ -118,6 +119,6 @@ const Mariaverse: React.FC = () => {
             </canvas>
         </div>
     );
-};
+});
 
 export default Mariaverse;

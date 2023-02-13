@@ -1,6 +1,6 @@
 import { Particle, ParticleType, particleTypes } from './Particle';
 import { rnd } from './random';
-import { defaultConfig, SpaceConfig } from './SpaceConfig';
+import { DEFAULT_CONFIG, SpaceConfig } from './SpaceConfig';
 import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
@@ -15,13 +15,13 @@ class Space {
     isRunning: boolean;
 
     constructor(config?: SpaceConfig) {
-        this.config = config || defaultConfig;
+        this.config = config || DEFAULT_CONFIG;
 
         this.masses = new Map<ParticleType, number>();
         particleTypes.forEach((type) => {
             this.masses.set(
                 type,
-                rnd(this.config.minMass, this.config.maxMass)
+                rnd(this.config.massMin, this.config.massMax)
             );
         });
 
@@ -31,7 +31,7 @@ class Space {
             particleTypes.forEach((typeB) => {
                 charges.set(
                     typeB,
-                    rnd(this.config.minAffinity, this.config.maxAffinity)
+                    rnd(this.config.affinityMin, this.config.affinityMax)
                 );
             });
             this.affinities.set(typeA, charges);
@@ -96,6 +96,10 @@ class Space {
         return this.config;
     }
 
+    public setConfig(config: SpaceConfig) {
+        this.config = config;
+    }
+
     public async update(delta: number): Promise<void> {
         if (this.isRunning) {
             console.log(
@@ -141,7 +145,7 @@ class Space {
         const r = subtract(particle1.position, particle2.position);
         const d = modulus(r);
 
-        if (d > 0 && d <= this.config.forceDistanceLimit) {
+        if (d > 0 && d <= this.config.forceDistanceCap) {
             let coefficient = 0;
             const affinityA = particle1.getAffinity(particle2.type);
 
@@ -169,7 +173,7 @@ class Space {
                 return (
                     particle2 !== probe &&
                     d > 0 &&
-                    d <= this.config.forceDistanceLimit
+                    d <= this.config.forceDistanceCap
                 );
             })
             .forEach((particle2) => {
