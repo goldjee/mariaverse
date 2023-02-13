@@ -1,9 +1,18 @@
 import React from 'react';
-import { AppShell, Grid, Header, Stack, Title } from '@mantine/core';
+import {
+    AppShell,
+    Grid,
+    Group,
+    Header,
+    Stack,
+    Title,
+    Image,
+} from '@mantine/core';
 import Mariaverse from './components/Mariaverse';
 import ConfigPanel from './components/ConfigPanel';
 import { StoreContext, stores } from './stores/stores';
 import About from './components/About';
+import logo from './logo.svg';
 
 const App: React.FC = () => {
     return (
@@ -12,7 +21,10 @@ const App: React.FC = () => {
                 padding="md"
                 header={
                     <Header height={60} p="xs">
-                        <Title>Mariaverse</Title>
+                        <Group spacing="xs">
+                            <Image src={logo} width={40} />
+                            <Title>Mariaverse</Title>
+                        </Group>
                     </Header>
                 }
             >
