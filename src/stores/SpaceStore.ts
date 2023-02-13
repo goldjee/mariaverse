@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx';
+import { ParticleProperties } from '../engine/Particle';
 import Space from '../engine/Space';
 import { DEFAULT_CONFIG, SpaceConfig } from '../engine/SpaceConfig';
 
@@ -33,8 +34,12 @@ class SpaceStore {
         return this.space.getConfig();
     }
 
-    public recreateRules(): void {
-        this.space.recreateRules();
+    public getParticleProperties(): ParticleProperties[] {
+        return this.space.getParticleProperties();
+    }
+
+    public recreateParticleProperties(): void {
+        this.space.recreateParticleProperties();
     }
 
     public repopulate(): void {

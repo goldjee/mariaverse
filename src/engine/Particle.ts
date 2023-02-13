@@ -11,6 +11,17 @@ export const particleTypes = [
 ];
 export type ParticleType = typeof particleTypes[number];
 
+export interface Affinity {
+    type: ParticleType;
+    affinity: number;
+}
+
+export interface ParticleProperties {
+    type: ParticleType;
+    mass: number;
+    affinities: Affinity[];
+}
+
 export class Particle {
     space: Space;
     type: ParticleType;
@@ -27,11 +38,16 @@ export class Particle {
     }
 
     public getMass(): number {
-        return this.space.masses.get(this.type) || 0;
+        const properties = this.space.getParticleProperties().find((property) => property.type === this.type);
+        return properties?.mass || 0;
     }
 
     public getAffinity(type: ParticleType): number {
-        return this.space.affinities.get(this.type)?.get(type) || 0;
+        const properties = this.space.getParticleProperties().find((property) => property.type === this.type);
+        if (!properties) return 0;
+        
+        const entry = properties.affinities.find((entry) => entry.type === type);
+        return entry?.affinity || 0;
     }
 
     public reflect(direction: vector.Direction) {

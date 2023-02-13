@@ -1,4 +1,4 @@
-import { Particle, ParticleType, particleTypes } from './Particle';
+import { Affinity, Particle, ParticleProperties, ParticleType, particleTypes } from './Particle';
 import { rnd } from './random';
 import { DEFAULT_CONFIG, SpaceConfig } from './SpaceConfig';
 import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
@@ -9,15 +9,14 @@ const debug = false;
 
 class Space {
     private config: SpaceConfig;
-    public masses: Map<ParticleType, number> = new Map();
-    public affinities: Map<ParticleType, Map<ParticleType, number>> = new Map();
+    public particleProperties: ParticleProperties[] = [];
     particles: Particle[] = [];
     isRunning = false;
 
     constructor(config?: SpaceConfig) {
         this.config = config || DEFAULT_CONFIG;
 
-        this.recreateRules();
+        this.recreateParticleProperties();
         this.repopulate();
     }
 
@@ -49,25 +48,22 @@ class Space {
         for (let i = 0; i < count; i++) this.addParticle(type);
     }
 
-    public recreateRules(): void {
-        this.masses = new Map<ParticleType, number>();
+    public recreateParticleProperties(): void {
+        this.particleProperties = [];
         particleTypes.forEach((type) => {
-            this.masses.set(
-                type,
-                rnd(this.config.massMin, this.config.massMax)
-            );
-        });
-
-        this.affinities = new Map<ParticleType, Map<ParticleType, number>>();
-        particleTypes.forEach((typeA) => {
-            const charges = new Map<ParticleType, number>();
+            const affinities: Affinity[] = [];
             particleTypes.forEach((typeB) => {
-                charges.set(
-                    typeB,
-                    rnd(this.config.affinityMin, this.config.affinityMax)
-                );
+                affinities.push({
+                    type: typeB,
+                    affinity: rnd(this.config.affinityMin, this.config.affinityMax)
+                });
             });
-            this.affinities.set(typeA, charges);
+
+            this.particleProperties.push({
+                type,
+                mass: rnd(this.config.massMin, this.config.massMax),
+                affinities,
+            });
         });
     }
 
@@ -106,6 +102,10 @@ class Space {
 
     public setConfig(config: SpaceConfig) {
         this.config = config;
+    }
+
+    public getParticleProperties(): ParticleProperties[] {
+        return this.particleProperties;
     }
 
     public async update(delta: number): Promise<void> {
