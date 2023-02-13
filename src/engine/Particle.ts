@@ -1,4 +1,4 @@
-import { ENERGY_DISSIPATION, VELOCITY_CAP } from './Space';
+import Space from './Space';
 import Vector, * as vector from './Vector';
 
 export const particleTypes = [
@@ -7,16 +7,19 @@ export const particleTypes = [
     'yellow',
     'blue',
     'cyan',
+    'magenta',
 ];
 export type ParticleType = typeof particleTypes[number];
 
 export class Particle {
+    space: Space;
     type: ParticleType;
     position: Vector;
     velocity: Vector;
     force: Vector;
 
-    constructor(type: ParticleType, position: Vector, velocity: Vector) {
+    constructor(space: Space, type: ParticleType, position: Vector, velocity: Vector) {
+        this.space = space;
         this.type = type;
         this.position = position;
         this.velocity = velocity;
@@ -24,11 +27,11 @@ export class Particle {
     }
 
     public getMass(): number {
-        return MASSES.get(this.type) || 0;
+        return this.space.masses.get(this.type) || 0;
     }
 
     public getAffinity(type: ParticleType): number {
-        return AFFINITIES.get(this.type)?.get(type) || 0;
+        return this.space.affinities.get(this.type)?.get(type) || 0;
     }
 
     public reflect(direction: vector.Direction) {
@@ -49,13 +52,13 @@ export class Particle {
             vector.multiply(acceleration, delta)
         );
 
-        this.velocity = vector.multiply(this.velocity, 1 - ENERGY_DISSIPATION);
+        this.velocity = vector.multiply(this.velocity, 1 - this.space.getConfig().energyDissipationFactor);
 
         const velocityModulus = vector.modulus(this.velocity);
-        if (velocityModulus >= VELOCITY_CAP) {
+        if (velocityModulus >= this.space.getConfig().velocityCap) {
             this.velocity = vector.multiply(
                 vector.normalize(this.velocity),
-                VELOCITY_CAP
+                this.space.getConfig().velocityCap
             );
         }
 
@@ -67,29 +70,3 @@ export class Particle {
         this.force = vector.ZERO;
     }
 }
-
-const MIN_MASS = 0.1;
-const MAX_MASS = 1.5;
-const MASSES: Map<ParticleType, number> = new Map<ParticleType, number>();
-particleTypes.forEach((type) => {
-    MASSES.set(type, Math.random() * (MAX_MASS - MIN_MASS) + MIN_MASS);
-});
-
-const MIN_AFFINITY = -10;
-const MAX_AFFINITY = 10;
-const AFFINITIES: Map<ParticleType, Map<ParticleType, number>> = new Map<
-    ParticleType,
-    Map<ParticleType, number>
->();
-particleTypes.forEach((typeA) => {
-    const charges = new Map<ParticleType, number>();
-    particleTypes.forEach((typeB) => {
-        charges.set(
-            typeB,
-            Math.random() * (MAX_AFFINITY - MIN_AFFINITY) + MIN_AFFINITY
-        );
-    });
-    AFFINITIES.set(typeA, charges);
-});
-
-console.log(AFFINITIES);

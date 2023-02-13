@@ -1,53 +1,59 @@
 import { Particle, ParticleType, particleTypes } from './Particle';
+import { rnd } from './random';
+import { defaultConfig, SpaceConfig } from './SpaceConfig';
 import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
 
-const GRID_SIZE_X = 18000; // size in units
-const GRID_SIZE_Y = 8000;
-
-const PARTICLE_COUNT_MIN = 300;
-const PARTICLE_COUNT_MAX = 300;
-
-export const VELOCITY_CAP = 2700;
-const VELOCITY_MAX = VELOCITY_CAP / 40;
-
-const FORCE_DISTANCE_LIMIT = 1500;
-const ALLOW_ASYMMETRIC_INTERACTIONS = true;
-
-export const ENERGY_DISSIPATION = 1e-5;
-
-const SLOWMO_FACTOR = 1e-3;
-
 const debug = false;
 
 class Space {
-    sizeX: number;
-    sizeY: number;
+    private config: SpaceConfig;
+    public masses: Map<ParticleType, number>;
+    public affinities: Map<ParticleType, Map<ParticleType, number>>;
     particles: Particle[];
-
     isRunning: boolean;
 
-    constructor() {
+    constructor(config?: SpaceConfig) {
+        this.config = config || defaultConfig;
+
+        this.masses = new Map<ParticleType, number>();
+        particleTypes.forEach((type) => {
+            this.masses.set(
+                type,
+                rnd(this.config.minMass, this.config.maxMass)
+            );
+        });
+
+        this.affinities = new Map<ParticleType, Map<ParticleType, number>>();
+        particleTypes.forEach((typeA) => {
+            const charges = new Map<ParticleType, number>();
+            particleTypes.forEach((typeB) => {
+                charges.set(
+                    typeB,
+                    rnd(this.config.minAffinity, this.config.maxAffinity)
+                );
+            });
+            this.affinities.set(typeA, charges);
+        });
+
         this.particles = [];
-        this.sizeX = GRID_SIZE_X;
-        this.sizeY = GRID_SIZE_Y;
         this.isRunning = true;
 
         if (debug) {
             this.addParticle(
                 'green',
                 {
-                    x: GRID_SIZE_X / 2 - 20,
-                    y: GRID_SIZE_X / 2,
+                    x: this.config.sizeX / 2 - 20,
+                    y: this.config.sizeY / 2,
                 },
                 { x: 0, y: 0 }
             );
             this.addParticle(
                 'green',
                 {
-                    x: GRID_SIZE_Y / 2 + 20,
-                    y: GRID_SIZE_Y / 2,
+                    x: this.config.sizeX / 2 + 20,
+                    y: this.config.sizeY / 2,
                 },
                 { x: 0, y: 0 }
             );
@@ -65,24 +71,29 @@ class Space {
     ) {
         if (!position)
             position = {
-                x: Math.random() * this.sizeX,
-                y: Math.random() * this.sizeY,
+                x: rnd() * this.config.sizeX,
+                y: rnd() * this.config.sizeY,
             } as Vector;
 
         if (!velocity)
             velocity = {
-                x: VELOCITY_MAX * (Math.random() * 2 - 1),
-                y: VELOCITY_MAX * (Math.random() * 2 - 1),
+                x: this.config.velocityMax * rnd(-1, 1),
+                y: this.config.velocityMax * rnd(-1, 1),
             } as Vector;
 
-        this.particles.push(new Particle(type, position, velocity));
+        this.particles.push(new Particle(this, type, position, velocity));
     }
 
     private addParticlePool(type: ParticleType) {
-        const count =
-            Math.random() * (PARTICLE_COUNT_MAX - PARTICLE_COUNT_MIN) +
-            PARTICLE_COUNT_MIN;
+        const count = rnd(
+            this.config.particleCountMax,
+            this.config.particleCountMin
+        );
         for (let i = 0; i < count; i++) this.addParticle(type);
+    }
+
+    public getConfig(): SpaceConfig {
+        return this.config;
     }
 
     public async update(delta: number): Promise<void> {
@@ -94,69 +105,77 @@ class Space {
             this.particles.forEach((particle) => {
                 if (
                     particle.position.x <= 0 ||
-                    particle.position.x >= this.sizeX
+                    particle.position.x >= this.config.sizeX
                 ) {
                     particle.reflect('x');
                     particle.position.x = Math.min(
                         Math.max(particle.position.x, 0),
-                        this.sizeX
+                        this.config.sizeX
                     );
                 }
                 if (
                     particle.position.y <= 0 ||
-                    particle.position.y >= this.sizeY
+                    particle.position.y >= this.config.sizeY
                 ) {
                     particle.reflect('y');
                     particle.position.y = Math.min(
                         Math.max(particle.position.y, 0),
-                        this.sizeY
+                        this.config.sizeY
                     );
                 }
 
-                executables.push(applyForceField(particle, this.particles));
+                executables.push(
+                    this.applyForceField(particle, this.particles)
+                );
             });
 
             await Promise.all(executables).then(() => {
                 this.particles.forEach((particle) => {
-                    particle.move(delta * SLOWMO_FACTOR);
+                    particle.move(delta * this.config.slowMoFactor);
                 });
             });
         }
     }
-}
 
-function getForce(particle1: Particle, particle2: Particle): Vector {
-    const r = subtract(particle1.position, particle2.position);
-    const d = modulus(r);
+    private getForce(particle1: Particle, particle2: Particle): Vector {
+        const r = subtract(particle1.position, particle2.position);
+        const d = modulus(r);
 
-    if (d > 0 && d <= FORCE_DISTANCE_LIMIT) {
-        let coefficient = 0;
-        const affinityA = particle1.getAffinity(particle2.type);
+        if (d > 0 && d <= this.config.forceDistanceLimit) {
+            let coefficient = 0;
+            const affinityA = particle1.getAffinity(particle2.type);
 
-        if (ALLOW_ASYMMETRIC_INTERACTIONS)
-            coefficient = Math.sign(affinityA) * Math.abs(affinityA * affinityA) / d;
-        else {
-            const affinityB = particle2.getAffinity(particle1.type);
-            coefficient = affinityA * affinityB / d;
-        }
+            if (this.config.hasAsymmetricInteractions)
+                coefficient =
+                    (Math.sign(affinityA) * Math.abs(affinityA * affinityA)) /
+                    d;
+            else {
+                const affinityB = particle2.getAffinity(particle1.type);
+                coefficient = (affinityA * affinityB) / d;
+            }
 
-        return multiply(r, coefficient);
-    } else return ZERO;
-}
+            return multiply(r, coefficient);
+        } else return ZERO;
+    }
 
-async function applyForceField(
-    probe: Particle,
-    particles: Particle[]
-): Promise<void> {
-    particles
-        .filter((particle2) => {
-            const r = subtract(probe.position, particle2.position);
-            const d = modulus(r);
-            return particle2 !== probe && d > 0 && d <= FORCE_DISTANCE_LIMIT;
-        })
-        .forEach((particle2) => {
-            probe.applyForce(getForce(probe, particle2));
-        });
+    private async applyForceField(
+        probe: Particle,
+        particles: Particle[]
+    ): Promise<void> {
+        particles
+            .filter((particle2) => {
+                const r = subtract(probe.position, particle2.position);
+                const d = modulus(r);
+                return (
+                    particle2 !== probe &&
+                    d > 0 &&
+                    d <= this.config.forceDistanceLimit
+                );
+            })
+            .forEach((particle2) => {
+                probe.applyForce(this.getForce(probe, particle2));
+            });
+    }
 }
 
 export default Space;

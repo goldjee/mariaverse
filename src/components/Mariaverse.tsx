@@ -24,14 +24,14 @@ const Mariaverse: React.FC = () => {
         if (parent.current) {
             const w = parent.current['offsetWidth'];
             const h = parent.current['offsetHeight'];
-            const scaleFactor = Math.min(w / space.sizeX, h / space.sizeY);
+            const scaleFactor = Math.min(w / space.getConfig().sizeX, h / space.getConfig().sizeY);
             setScale(scaleFactor);
             setSize({
-                width: space.sizeX * scaleFactor,
-                height: space.sizeY * scaleFactor,
+                width: space.getConfig().sizeX * scaleFactor,
+                height: space.getConfig().sizeY * scaleFactor,
             });
         }
-    }, [space.sizeX, space.sizeY]);
+    }, [space.getConfig().sizeX, space.getConfig().sizeY]);
 
     const drawCircle = useCallback(
         (
@@ -97,6 +97,7 @@ const Mariaverse: React.FC = () => {
 
     useEffect(() => {
         setCanvasDimensions();
+        window.addEventListener('resize', setCanvasDimensions);
     }, [setCanvasDimensions]);
 
     useEffect(() => {
