@@ -112,7 +112,7 @@ const Mariaverse: React.FC = observer(() => {
     }, [renderFrame]);
 
     return (
-        <div ref={parent} style={{ width: '100%' }}>
+        <div ref={parent} style={{ width: '100%', maxWidth: '100vw' }}>
             <canvas ref={canvasRef} width={size.width} height={size.height}>
                 Прости, но похоже, в твоем браузере не поддерживаются нужные
                 технологии. Попробуй Chrome или Firefox/
