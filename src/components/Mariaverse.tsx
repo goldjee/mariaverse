@@ -25,7 +25,7 @@ const Mariaverse: React.FC = observer(() => {
         if (parent.current) {
             const w = parent.current['offsetWidth'];
             const h = parent.current['offsetHeight'];
-            const scaleFactor = Math.min(w / spaceStore.getConfig().sizeX, h / spaceStore.getConfig().sizeY);
+            const scaleFactor = Math.max(w / spaceStore.getConfig().sizeX, h / spaceStore.getConfig().sizeY);
             setScale(scaleFactor);
             setSize({
                 width: spaceStore.getConfig().sizeX * scaleFactor,
@@ -112,7 +112,7 @@ const Mariaverse: React.FC = observer(() => {
     }, [renderFrame]);
 
     return (
-        <div ref={parent} style={{ width: '100%', height: '100%' }}>
+        <div ref={parent} style={{ width: '100%' }}>
             <canvas ref={canvasRef} width={size.width} height={size.height}>
                 Прости, но похоже, в твоем браузере не поддерживаются нужные
                 технологии. Попробуй Chrome или Firefox/

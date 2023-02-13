@@ -9,59 +9,16 @@ const debug = false;
 
 class Space {
     private config: SpaceConfig;
-    public masses: Map<ParticleType, number>;
-    public affinities: Map<ParticleType, Map<ParticleType, number>>;
-    particles: Particle[];
-    isRunning: boolean;
+    public masses: Map<ParticleType, number> = new Map();
+    public affinities: Map<ParticleType, Map<ParticleType, number>> = new Map();
+    particles: Particle[] = [];
+    isRunning = false;
 
     constructor(config?: SpaceConfig) {
         this.config = config || DEFAULT_CONFIG;
 
-        this.masses = new Map<ParticleType, number>();
-        particleTypes.forEach((type) => {
-            this.masses.set(
-                type,
-                rnd(this.config.massMin, this.config.massMax)
-            );
-        });
-
-        this.affinities = new Map<ParticleType, Map<ParticleType, number>>();
-        particleTypes.forEach((typeA) => {
-            const charges = new Map<ParticleType, number>();
-            particleTypes.forEach((typeB) => {
-                charges.set(
-                    typeB,
-                    rnd(this.config.affinityMin, this.config.affinityMax)
-                );
-            });
-            this.affinities.set(typeA, charges);
-        });
-
-        this.particles = [];
-        this.isRunning = true;
-
-        if (debug) {
-            this.addParticle(
-                'green',
-                {
-                    x: this.config.sizeX / 2 - 20,
-                    y: this.config.sizeY / 2,
-                },
-                { x: 0, y: 0 }
-            );
-            this.addParticle(
-                'green',
-                {
-                    x: this.config.sizeX / 2 + 20,
-                    y: this.config.sizeY / 2,
-                },
-                { x: 0, y: 0 }
-            );
-        } else {
-            particleTypes.forEach((type) => {
-                this.addParticlePool(type);
-            });
-        }
+        this.recreateRules();
+        this.repopulate();
     }
 
     private addParticle(
@@ -90,6 +47,57 @@ class Space {
             this.config.particleCountMin
         );
         for (let i = 0; i < count; i++) this.addParticle(type);
+    }
+
+    public recreateRules(): void {
+        this.masses = new Map<ParticleType, number>();
+        particleTypes.forEach((type) => {
+            this.masses.set(
+                type,
+                rnd(this.config.massMin, this.config.massMax)
+            );
+        });
+
+        this.affinities = new Map<ParticleType, Map<ParticleType, number>>();
+        particleTypes.forEach((typeA) => {
+            const charges = new Map<ParticleType, number>();
+            particleTypes.forEach((typeB) => {
+                charges.set(
+                    typeB,
+                    rnd(this.config.affinityMin, this.config.affinityMax)
+                );
+            });
+            this.affinities.set(typeA, charges);
+        });
+    }
+
+    public repopulate(): void {
+        this.isRunning = false;
+        this.particles = [];
+
+        if (debug) {
+            this.addParticle(
+                'green',
+                {
+                    x: this.config.sizeX / 2 - 20,
+                    y: this.config.sizeY / 2,
+                },
+                { x: 0, y: 0 }
+            );
+            this.addParticle(
+                'green',
+                {
+                    x: this.config.sizeX / 2 + 20,
+                    y: this.config.sizeY / 2,
+                },
+                { x: 0, y: 0 }
+            );
+        } else {
+            particleTypes.forEach((type) => {
+                this.addParticlePool(type);
+            });
+        }
+        this.isRunning = true;
     }
 
     public getConfig(): SpaceConfig {

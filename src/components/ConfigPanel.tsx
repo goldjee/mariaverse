@@ -8,24 +8,51 @@ import {
     Title,
     Card,
     Group,
+    Button,
+    ActionIcon,
+    Tooltip,
 } from '@mantine/core';
+import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
 import { DEFAULT_CONFIG, SpaceConfig } from '../engine/SpaceConfig';
 import ConfigEntry from './ConfigEntry';
 import { useStore } from '../stores/stores';
 
 const ConfigPanel: React.FC = observer(() => {
     const { spaceStore } = useStore();
-    const [config, setConfig] = useState<SpaceConfig>(spaceStore.space.getConfig() || DEFAULT_CONFIG);
+    const [config, setConfig] = useState<SpaceConfig>(
+        spaceStore.space.getConfig() || DEFAULT_CONFIG
+    );
 
     const onChange = useCallback(
         (value: number | boolean | undefined, key: string) => {
-            if (key in config)
+            if (key in config) {
                 setConfig((prev) => {
-                    return { ...prev, ...{ [key]: value } } as SpaceConfig;
+                    const newConfig = {
+                        ...prev,
+                        ...{ [key]: value },
+                    } as SpaceConfig;
+                    spaceStore.setConfig(newConfig);
+                    return newConfig;
                 });
+            }
         },
-        [config]
+        [config, spaceStore]
     );
+
+    const reset = useCallback(() => {
+        spaceStore.setConfig();
+        setConfig(spaceStore.getConfig());
+        spaceStore.recreateRules();
+        spaceStore.repopulate();
+    }, [spaceStore]);
+
+    const recreateRules = useCallback(() => {
+        spaceStore.recreateRules();
+    }, [spaceStore]);
+
+    const repopulate = useCallback(() => {
+        spaceStore.repopulate();
+    }, [spaceStore]);
 
     useEffect(() => {
         spaceStore.space.setConfig(config);
@@ -35,7 +62,67 @@ const ConfigPanel: React.FC = observer(() => {
         <Stack align="flex-start" justify="flex-start">
             <Card w="100%">
                 <Stack>
-                    <Title order={5}>Параметры генерации</Title>
+                    <Group position="apart">
+                        <Title order={5}>Свойства вселенной</Title>
+                        <Tooltip label="Сбросить настройки">
+                            <ActionIcon
+                                onClick={reset}
+                                color="red"
+                                variant="outline"
+                            >
+                                <BsArrowClockwise />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
+                    <ConfigEntry label="Скорость света">
+                        <NumberInput
+                            min={0}
+                            value={config.velocityCap}
+                            step={100}
+                            onChange={(value) => onChange(value, 'velocityCap')}
+                        />
+                    </ConfigEntry>
+                    <ConfigEntry label="Предел дальнодействия">
+                        <NumberInput
+                            min={400}
+                            value={config.forceDistanceCap}
+                            step={50}
+                            onChange={(value) =>
+                                onChange(value, 'forceDistanceCap')
+                            }
+                        />
+                    </ConfigEntry>
+                    <ConfigEntry label="Асимметричные взаимодействия">
+                        <Switch
+                            checked={config.hasAsymmetricInteractions}
+                            onChange={(e) =>
+                                onChange(
+                                    e.currentTarget.checked,
+                                    'hasAsymmetricInteractions'
+                                )
+                            }
+                        />
+                    </ConfigEntry>
+                    <ConfigEntry label="Потери энергии">
+                        <Slider
+                            scale={(v) => 10 ** v}
+                            step={1}
+                            min={-10}
+                            max={0}
+                            value={Math.log10(config.energyDissipationFactor)}
+                            onChange={(value) =>
+                                onChange(
+                                    Math.pow(10, value),
+                                    'energyDissipationFactor'
+                                )
+                            }
+                        />
+                    </ConfigEntry>
+                </Stack>
+            </Card>
+            <Card w="100%">
+                <Stack>
+                    <Title order={5}>Частицы</Title>
                     <ConfigEntry label="Количество частиц">
                         <Group position="left" grow>
                             <NumberInput
@@ -114,50 +201,17 @@ const ConfigPanel: React.FC = observer(() => {
                             />
                         </Group>
                     </ConfigEntry>
-                </Stack>
-            </Card>
-            <Card w="100%">
-                <Stack>
-                    <Title order={5}>Свойства мира</Title>
-                    <ConfigEntry label="Скорость света">
-                        <NumberInput
-                            min={0}
-                            value={config.velocityCap}
-                            step={100}
-                            onChange={(value) => onChange(value, 'velocityCap')}
-                        />
-                    </ConfigEntry>
-                    <ConfigEntry label="Предел дальнодействия">
-                        <NumberInput
-                            min={400}
-                            value={config.forceDistanceCap}
-                            step={50}
-                            onChange={(value) =>
-                                onChange(value, 'forceDistanceCap')
-                            }
-                        />
-                    </ConfigEntry>
-                    <ConfigEntry label="Асимметричные взаимодействия">
-                        <Switch
-                            checked={config.hasAsymmetricInteractions}
-                            onChange={(e) =>
-                                onChange(
-                                    e.currentTarget.checked,
-                                    'hasAsymmetricInteractions'
-                                )
-                            }
-                        />
-                    </ConfigEntry>
-                    <ConfigEntry label="Потери энергии">
-                        <Slider
-                            scale={(v) => 10 ** v}
-                            step={1}
-                            min={-10}
-                            max={0}
-                            value={Math.log10(config.energyDissipationFactor)}
-                            onChange={(value) => onChange(Math.pow(10, value), 'energyDissipationFactor')}
-                        />
-                    </ConfigEntry>
+                    <Group position="left" grow>
+                        <Button onClick={repopulate} leftIcon={<BsWind />}>
+                            Пересоздать
+                        </Button>
+                        <Button
+                            onClick={recreateRules}
+                            leftIcon={<BsArrowLeftRight />}
+                        >
+                            Обновить правила
+                        </Button>
+                    </Group>
                 </Stack>
             </Card>
         </Stack>

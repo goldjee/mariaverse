@@ -1,8 +1,9 @@
 import React from 'react';
-import { AppShell, Center, Grid, Header, Title } from '@mantine/core';
+import { AppShell, Grid, Header, Stack, Title } from '@mantine/core';
 import Mariaverse from './components/Mariaverse';
 import ConfigPanel from './components/ConfigPanel';
 import { StoreContext, stores } from './stores/stores';
+import About from './components/About';
 
 const App: React.FC = () => {
     return (
@@ -17,9 +18,10 @@ const App: React.FC = () => {
             >
                 <Grid h="100%">
                     <Grid.Col span={8}>
-                        <Center h="100%">
+                        <Stack h="100%">
                             <Mariaverse />
-                        </Center>
+                            <About />
+                        </Stack>
                     </Grid.Col>
                     <Grid.Col span={4}>
                         <ConfigPanel />

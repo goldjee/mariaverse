@@ -1,21 +1,44 @@
 import { makeAutoObservable } from 'mobx';
 import Space from '../engine/Space';
-import { SpaceConfig } from '../engine/SpaceConfig';
+import { DEFAULT_CONFIG, SpaceConfig } from '../engine/SpaceConfig';
 
 class SpaceStore {
     public space: Space;
 
     constructor() {
-        this.space = new Space();
+        const config = this.loadConfig();
+        this.space = new Space(config);
+        this.saveConfig(config);
         makeAutoObservable(this);
     }
 
-    public setConfig(config: SpaceConfig): void {
+    private loadConfig(): SpaceConfig {
+        const configString = localStorage.getItem('config');
+        if (!configString) return DEFAULT_CONFIG;
+
+        return JSON.parse(configString);
+    }
+
+    private saveConfig(config: SpaceConfig): void {
+        localStorage.setItem('config', JSON.stringify(config));
+    }
+
+    public setConfig(config?: SpaceConfig): void {
+        config = config || DEFAULT_CONFIG;
         this.space.setConfig(config);
+        this.saveConfig(config);
     }
 
     public getConfig(): SpaceConfig {
         return this.space.getConfig();
+    }
+
+    public recreateRules(): void {
+        this.space.recreateRules();
+    }
+
+    public repopulate(): void {
+        this.space.repopulate();
     }
 }
 

@@ -8,7 +8,7 @@ interface Props {
 
 const ConfigEntry: React.FC<Props & FlexProps> = ({ label, children, ...rest }) => {
     return (
-        <Flex w={rest.w || '100%'} direction="row" justify="flex-start" align="flex-start">
+        <Flex w={rest.w || '100%'} direction="row" justify="flex-start" align="center">
             <Text w="40%">{label}</Text>
             <Box w="60%">
                 {children}
