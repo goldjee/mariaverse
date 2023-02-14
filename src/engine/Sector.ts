@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Particle, ParticleType, particleTypes } from './Particle';
-import Vector, { sum } from './Vector';
+import Vector, { multiply, sum } from './Vector';
 
 class Sector {
     topLeft: Vector;
@@ -35,9 +35,10 @@ class Sector {
                     return;
                 }
 
-                const center = sum(
-                    ...particles.map((particle) => particle.position)
+                const positions: Vector[] = particles.map(
+                    (particle) => particle.position
                 );
+                const center = multiply(sum(...positions), positions.length);
                 this.chargeCenters.set(type, center);
             }
         });
