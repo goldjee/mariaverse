@@ -193,7 +193,7 @@ const ConfigPanel: React.FC = observer(() => {
                         <Group position="left" grow>
                             <NumberInput
                                 label="мин"
-                                min={-10}
+                                min={-100}
                                 max={config.affinityMax}
                                 value={config.affinityMin}
                                 step={0.1}
@@ -206,7 +206,7 @@ const ConfigPanel: React.FC = observer(() => {
                             <NumberInput
                                 label="макс"
                                 min={config.affinityMin}
-                                max={10}
+                                max={100}
                                 value={config.affinityMax}
                                 step={0.1}
                                 precision={1}

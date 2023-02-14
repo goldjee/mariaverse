@@ -9,11 +9,11 @@ import {
 import { rnd } from './random';
 import Sector from './Sector';
 import { DEFAULT_CONFIG, SpaceConfig } from './SpaceConfig';
-import Vector, { distance, modulus, multiply, subtract, ZERO } from './Vector';
+import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
 
-const GRID_SIZE = 20;
+const GRID_SIZE = 10;
 const debug = false;
 
 class Space {
@@ -198,9 +198,9 @@ class Space {
 
     public update(delta: number): void {
         if (this.isRunning) {
-            // console.log(
-            //     `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
-            // );
+            console.log(
+                `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
+            );
 
             this.sectors.forEach((sector) => {
                 if (sector.isEmpty()) return;
@@ -274,8 +274,9 @@ class Space {
                     const particleCount = sector.getParticles(type).length;
                     const affinityA = this.getAffinity(probe.type, type);
                     const affinityB = this.getAffinity(type, probe.type);
+                    const r = subtract(probe.position, sector.getChargeCenter(probe.type));
                     const force = multiply(
-                        this.getForce(rSector, affinityA, affinityB),
+                        this.getForce(r, affinityA, affinityB),
                         particleCount
                     );
                     probe.applyForce(force);

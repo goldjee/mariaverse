@@ -32,8 +32,8 @@ export const DEFAULT_CONFIG = {
     massMin: 0.1,
     massMax: 1.5,
 
-    affinityMin: -10,
-    affinityMax: 10,
+    affinityMin: -100,
+    affinityMax: 100,
 
     velocityCap: 2700,
     velocityMax: 2700 / 40,
