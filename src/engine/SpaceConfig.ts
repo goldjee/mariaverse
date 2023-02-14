@@ -10,6 +10,7 @@ export interface SpaceConfig {
 
     affinityMin: number;
     affinityMax: number;
+    wallAffinity: number;
 
     velocityCap: number;
     velocityMax: number;
@@ -34,6 +35,8 @@ export const DEFAULT_CONFIG = {
 
     affinityMin: -100,
     affinityMax: 100,
+
+    wallAffinity: -20,
 
     velocityCap: 2700,
     velocityMax: 2700 / 40,

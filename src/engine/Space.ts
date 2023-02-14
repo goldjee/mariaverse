@@ -206,9 +206,11 @@ class Space {
 
     public update(delta: number): void {
         if (this.isRunning) {
-            console.log(
-                `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
-            );
+            // console.log(
+            //     `FPS: ${Math.round(1000 / delta)}, frame time: ${delta} ms`
+            // );
+
+            // console.log(`Particles total: ${this.getParticles().length}`);
 
             this.sectors.forEach((sector) => {
                 if (sector.isEmpty()) return;
@@ -220,46 +222,38 @@ class Space {
 
             this.sectors.forEach((sector) => {
                 sector.getParticles().forEach((particle) => {
-                    particle.move(delta * this.config.slowMoFactor);
-
                     const { top, right, bottom, left } =
                         this.getWallProximity(particle);
 
                     // repel from walls
                     const wallRepel =
                         -1 *
-                        Math.abs(this.config.affinityMax) *
+                        Math.abs(this.config.wallAffinity) *
                         Math.abs(particle.getMass());
-                    if (Math.abs(left.x) <= this.config.forceDistanceCap) {
-                        const force = this.getForce(left, wallRepel, wallRepel);
-                        particle.applyForce(force);
-                    }
-                    if (Math.abs(right.x) <= this.config.forceDistanceCap) {
-                        const force = this.getForce(
-                            right,
-                            wallRepel,
-                            wallRepel
-                        );
-                        particle.applyForce(force);
-                    }
-                    if (Math.abs(top.y) <= this.config.forceDistanceCap) {
-                        const force = this.getForce(top, wallRepel, wallRepel);
-                        particle.applyForce(force);
-                    }
-                    if (Math.abs(bottom.y) <= this.config.forceDistanceCap) {
-                        const force = this.getForce(
-                            bottom,
-                            wallRepel,
-                            wallRepel
-                        );
-                        particle.applyForce(force);
-                    }
+                    const wallRepelForces: Vector[] = [];
+                    if (Math.abs(left.x) <= this.config.forceDistanceCap)
+                        wallRepelForces.push(this.getForce(left, wallRepel));
+
+                    if (Math.abs(right.x) <= this.config.forceDistanceCap)
+                        wallRepelForces.push(this.getForce(right, wallRepel));
+
+                    if (Math.abs(top.y) <= this.config.forceDistanceCap)
+                        wallRepelForces.push(this.getForce(top, wallRepel));
+
+                    if (Math.abs(bottom.y) <= this.config.forceDistanceCap)
+                        wallRepelForces.push(this.getForce(bottom, wallRepel));
+
+                    wallRepelForces.forEach((force) =>
+                        particle.applyForce(force)
+                    );
+
+                    particle.move(delta * this.config.slowMoFactor);
 
                     // reflect from walls
-                    if (left.x >= 0) particle.reflect(left);
-                    if (right.x <= 0) particle.reflect(right);
-                    if (top.y >= 0) particle.reflect(top);
-                    if (bottom.y <= 0) particle.reflect(bottom);
+                    if (left.x > 0) particle.reflect(left);
+                    if (right.x < 0) particle.reflect(right);
+                    if (top.y > 0) particle.reflect(top);
+                    if (bottom.y < 0) particle.reflect(bottom);
 
                     const newSector = this.findSector(particle.position);
                     if (newSector && newSector !== sector) {
@@ -291,17 +285,19 @@ class Space {
         };
     }
 
-    private getForce(r: Vector, affinityA: number, affinityB: number): Vector {
-        const d = modulus(r);
+    private getForce(r: Vector, affinityA: number, affinityB?: number): Vector {
+        let d = modulus(r);
 
-        if (d > 0 && d <= this.config.forceDistanceCap) {
+        if (d <= this.config.forceDistanceCap) {
             let coefficient = 0;
+            const flattenDistance = 1e-6;
+            d = (d <= flattenDistance ? flattenDistance : d);
 
-            if (this.config.hasAsymmetricInteractions)
+            if (!affinityB)
                 coefficient =
                     (Math.sign(affinityA) * Math.abs(affinityA * affinityA)) /
                     d;
-            else coefficient = (affinityA * affinityB) / d;
+            else coefficient = (affinityA * affinityB) / (d * d);
 
             return multiply(r, coefficient);
         } else return ZERO;
@@ -319,7 +315,9 @@ class Space {
                 particleTypes.forEach((type) => {
                     const particleCount = sector.getParticles(type).length;
                     const affinityA = this.getAffinity(probe.type, type);
-                    const affinityB = this.getAffinity(type, probe.type);
+                    const affinityB = this.config.hasAsymmetricInteractions
+                        ? undefined
+                        : this.getAffinity(type, probe.type);
                     const r = subtract(
                         probe.position,
                         sector.getChargeCenter(probe.type)
@@ -339,10 +337,9 @@ class Space {
                         probe.type,
                         neighbor.type
                     );
-                    const affinityB = this.getAffinity(
-                        neighbor.type,
-                        probe.type
-                    );
+                    const affinityB = this.config.hasAsymmetricInteractions
+                        ? undefined
+                        : this.getAffinity(neighbor.type, probe.type);
                     const force = this.getForce(r, affinityA, affinityB);
                     probe.applyForce(force);
                 });
