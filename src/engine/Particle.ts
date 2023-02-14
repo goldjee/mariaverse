@@ -46,11 +46,16 @@ export class Particle {
         return this.space.getAffinity(this.type, type);
     }
 
-    public reflect(direction: vector.Direction) {
-        this.velocity = vector.reflect(this.velocity, direction);
+    public reflect(overshoot: Vector): void {
+        this.position = vector.sum(this.position, vector.multiply(overshoot, 2));
+
+        if (overshoot.x != 0)
+            this.velocity = vector.reflect(this.velocity, 'x');
+        if (overshoot.y != 0)
+            this.velocity = vector.reflect(this.velocity, 'y');
     }
 
-    public applyForce(force: Vector) {
+    public applyForce(force: Vector): void {
         this.force = vector.sum(this.force, force);
     }
 

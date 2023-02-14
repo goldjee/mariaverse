@@ -47,9 +47,17 @@ class Space {
 
         // populating neighbors
         this.sectors.forEach((sector) => {
-            for (let x = sector.center.x - sectorSizeX; x <= sector.center.x + sectorSizeX; x += sectorSizeX) {
-                for (let y = sector.center.y - sectorSizeY; y <= sector.center.y + sectorSizeY; y += sectorSizeY) {
-                    const neighbor = this.findSector({x, y});
+            for (
+                let x = sector.center.x - sectorSizeX;
+                x <= sector.center.x + sectorSizeX;
+                x += sectorSizeX
+            ) {
+                for (
+                    let y = sector.center.y - sectorSizeY;
+                    y <= sector.center.y + sectorSizeY;
+                    y += sectorSizeY
+                ) {
+                    const neighbor = this.findSector({ x, y });
                     if (neighbor) sector.neighbors.push(neighbor);
                 }
             }
@@ -214,26 +222,44 @@ class Space {
                 sector.getParticles().forEach((particle) => {
                     particle.move(delta * this.config.slowMoFactor);
 
-                    if (
-                        particle.position.x <= 0 ||
-                        particle.position.x >= this.config.sizeX
-                    ) {
-                        particle.reflect('x');
-                        particle.position.x = Math.min(
-                            Math.max(particle.position.x, 0),
-                            this.config.sizeX
-                        );
+                    const { top, right, bottom, left } =
+                        this.getWallProximity(particle);
+
+                    // repel from walls
+                    const wallRepel =
+                        -1 *
+                        Math.abs(this.config.affinityMax) *
+                        Math.abs(particle.getMass());
+                    if (Math.abs(left.x) <= this.config.forceDistanceCap) {
+                        const force = this.getForce(left, wallRepel, wallRepel);
+                        particle.applyForce(force);
                     }
-                    if (
-                        particle.position.y <= 0 ||
-                        particle.position.y >= this.config.sizeY
-                    ) {
-                        particle.reflect('y');
-                        particle.position.y = Math.min(
-                            Math.max(particle.position.y, 0),
-                            this.config.sizeY
+                    if (Math.abs(right.x) <= this.config.forceDistanceCap) {
+                        const force = this.getForce(
+                            right,
+                            wallRepel,
+                            wallRepel
                         );
+                        particle.applyForce(force);
                     }
+                    if (Math.abs(top.y) <= this.config.forceDistanceCap) {
+                        const force = this.getForce(top, wallRepel, wallRepel);
+                        particle.applyForce(force);
+                    }
+                    if (Math.abs(bottom.y) <= this.config.forceDistanceCap) {
+                        const force = this.getForce(
+                            bottom,
+                            wallRepel,
+                            wallRepel
+                        );
+                        particle.applyForce(force);
+                    }
+
+                    // reflect from walls
+                    if (left.x >= 0) particle.reflect(left);
+                    if (right.x <= 0) particle.reflect(right);
+                    if (top.y >= 0) particle.reflect(top);
+                    if (bottom.y <= 0) particle.reflect(bottom);
 
                     const newSector = this.findSector(particle.position);
                     if (newSector && newSector !== sector) {
@@ -243,6 +269,26 @@ class Space {
                 });
             });
         }
+    }
+
+    private getWallProximity(particle: Particle): {
+        top: Vector;
+        left: Vector;
+        right: Vector;
+        bottom: Vector;
+    } {
+        return {
+            top: { x: 0, y: 0 - particle.position.y },
+            left: { x: 0 - particle.position.x, y: 0 },
+            right: {
+                x: this.config.sizeX - particle.position.x,
+                y: 0,
+            },
+            bottom: {
+                x: 0,
+                y: this.config.sizeY - particle.position.y,
+            },
+        };
     }
 
     private getForce(r: Vector, affinityA: number, affinityB: number): Vector {
@@ -274,7 +320,10 @@ class Space {
                     const particleCount = sector.getParticles(type).length;
                     const affinityA = this.getAffinity(probe.type, type);
                     const affinityB = this.getAffinity(type, probe.type);
-                    const r = subtract(probe.position, sector.getChargeCenter(probe.type));
+                    const r = subtract(
+                        probe.position,
+                        sector.getChargeCenter(probe.type)
+                    );
                     const force = multiply(
                         this.getForce(r, affinityA, affinityB),
                         particleCount
