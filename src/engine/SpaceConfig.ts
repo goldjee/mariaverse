@@ -27,8 +27,8 @@ export const DEFAULT_CONFIG = {
     sizeX: 18000,
     sizeY: 8000,
 
-    particleCountMin: 300,
-    particleCountMax: 300,
+    particleCountMin: 500,
+    particleCountMax: 500,
 
     massMin: 0.1,
     massMax: 1.5,
@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG = {
     affinityMin: -100,
     affinityMax: 100,
 
-    wallAffinity: -20,
+    wallAffinity: -50,
 
     velocityCap: 2700,
     velocityMax: 2700 / 40,
@@ -44,7 +44,7 @@ export const DEFAULT_CONFIG = {
     forceDistanceCap: 1500,
     hasAsymmetricInteractions: true,
 
-    energyDissipationFactor: 1e-5,
+    energyDissipationFactor: 1e-6,
 
     slowMoFactor: 1e-3,
 } as SpaceConfig;

@@ -38,7 +38,10 @@ class Sector {
                 const positions: Vector[] = particles.map(
                     (particle) => particle.position
                 );
-                const center = multiply(sum(...positions), positions.length);
+                const center = multiply(
+                    sum(...positions),
+                    1 / positions.length
+                );
                 this.chargeCenters.set(type, center);
             }
         });
