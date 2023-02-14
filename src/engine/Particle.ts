@@ -43,11 +43,7 @@ export class Particle {
     }
 
     public getAffinity(type: ParticleType): number {
-        const properties = this.space.getParticleProperties().find((property) => property.type === this.type);
-        if (!properties) return 0;
-        
-        const entry = properties.affinities.find((entry) => entry.type === type);
-        return entry?.affinity || 0;
+        return this.space.getAffinity(this.type, type);
     }
 
     public reflect(direction: vector.Direction) {

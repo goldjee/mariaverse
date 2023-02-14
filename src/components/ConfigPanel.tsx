@@ -155,7 +155,7 @@ const ConfigPanel: React.FC = observer(() => {
                             <NumberInput
                                 label="макс"
                                 min={config.particleCountMin}
-                                max={500}
+                                max={2000}
                                 value={config.particleCountMax}
                                 step={1}
                                 onChange={(value) =>

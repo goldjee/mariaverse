@@ -87,7 +87,7 @@ const Mariaverse: React.FC = observer(() => {
 
             // rendering
             clearBackground(context);
-            spaceStore.space.particles.map((particle) => {
+            spaceStore.space.getParticles().map((particle) => {
                 drawParticle(context, particle);
             });
 

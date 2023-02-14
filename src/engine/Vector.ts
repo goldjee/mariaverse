@@ -8,7 +8,7 @@ export type Direction = 'x' | 'y' | 'xy';
 export const ZERO = {x: 0, y: 0};
 
 export function modulus(vector: Vector): number {
-    return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2));
+    return (vector.x * vector.x + vector.y * vector.y) ** .5;
 }
 
 export function sum(...vectors: Vector[]): Vector {
