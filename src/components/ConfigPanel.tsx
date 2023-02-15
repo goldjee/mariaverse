@@ -13,9 +13,11 @@ import {
     Tooltip,
 } from '@mantine/core';
 import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
+import { GiWeight } from 'react-icons/gi';
 import { DEFAULT_CONFIG, SpaceConfig } from '../engine/SpaceConfig';
 import ConfigEntry from './ConfigEntry';
 import { useStore } from '../stores/stores';
+import Circle from './Circle';
 
 const ConfigPanel: React.FC = observer(() => {
     const { spaceStore } = useStore();
@@ -115,10 +117,7 @@ const ConfigPanel: React.FC = observer(() => {
                             max={0}
                             value={Math.log10(config.viscosity)}
                             onChange={(value) =>
-                                onChange(
-                                    Math.pow(10, value),
-                                    'viscosity'
-                                )
+                                onChange(Math.pow(10, value), 'viscosity')
                             }
                         />
                     </ConfigEntry>
@@ -235,14 +234,29 @@ const ConfigPanel: React.FC = observer(() => {
                         </Tooltip>
                     </Group>
                     {particleProperties.map((properties) => (
-                        <Stack key={properties.type}>
-                            <Title order={6}>{properties.type}</Title>
-                            <ConfigEntry label="Масса">
+                        <Stack key={properties.type} spacing="xs">
+                            <ConfigEntry
+                                icon={
+                                    <Title order={6} color={properties.type}>
+                                        <Group spacing="sm">
+                                            <GiWeight />
+                                            {properties.type}
+                                        </Group>
+                                    </Title>
+                                }
+                            >
                                 <Text>{properties.mass.toFixed(6)}</Text>
                             </ConfigEntry>
                             {properties.affinities.map((affinity) => (
                                 <ConfigEntry
-                                    label={`${properties.type} → ${affinity.type}`}
+                                    icon={
+                                        <Group spacing="sm">
+                                            <Circle color={properties.type} />
+                                            <Text>→</Text>
+                                            <Circle color={affinity.type} />
+                                        </Group>
+                                    }
+                                    // label={`${properties.type} → ${affinity.type}`}
                                     key={`${properties.type} -> ${affinity.type}`}
                                 >
                                     <Text>{affinity.affinity.toFixed(6)}</Text>

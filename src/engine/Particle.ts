@@ -3,12 +3,14 @@ import Space from './Space';
 import Vector, * as vector from './Vector';
 
 export const particleTypes = [
-    'green',
-    'red',
-    'yellow',
-    'blue',
-    'cyan',
-    'magenta',
+    '#23a4ec',
+    '#23ec68',
+    '#ecd823',
+    '#23e0ec',
+    '#ec2f23',
+    '#d023ec',
+    '#ec9023',
+    '#fefefe',
 ];
 export type ParticleType = typeof particleTypes[number];
 
@@ -30,7 +32,12 @@ export class Particle {
     velocity: Vector;
     force: Vector;
 
-    constructor(space: Space, type: ParticleType, position: Vector, velocity: Vector) {
+    constructor(
+        space: Space,
+        type: ParticleType,
+        position: Vector,
+        velocity: Vector
+    ) {
         this.space = space;
         this.type = type;
         this.position = position;
@@ -39,7 +46,9 @@ export class Particle {
     }
 
     public getMass(): number {
-        const properties = this.space.getParticleProperties().find((property) => property.type === this.type);
+        const properties = this.space
+            .getParticleProperties()
+            .find((property) => property.type === this.type);
         return properties?.mass || 0;
     }
 
@@ -52,7 +61,10 @@ export class Particle {
     }
 
     public reflect(overshoot: Vector): void {
-        this.position = vector.sum(this.position, vector.multiply(overshoot, 2));
+        this.position = vector.sum(
+            this.position,
+            vector.multiply(overshoot, 2)
+        );
 
         if (overshoot.x != 0)
             this.velocity = vector.reflect(this.velocity, 'x');
@@ -82,7 +94,10 @@ export class Particle {
             );
         }
 
-        this.velocity = vector.multiply(this.velocity, 1 - this.space.getConfig().viscosity);
+        this.velocity = vector.multiply(
+            this.velocity,
+            1 - this.space.getConfig().viscosity
+        );
 
         this.position = vector.sum(
             this.position,
