@@ -74,8 +74,6 @@ export class Particle {
             vector.multiply(acceleration, delta)
         );
 
-        this.velocity = vector.multiply(this.velocity, 1 - this.space.getConfig().energyDissipationFactor);
-
         const velocityModulus = vector.modulus(this.velocity);
         if (velocityModulus >= this.space.getConfig().velocityCap) {
             this.velocity = vector.multiply(
@@ -83,6 +81,8 @@ export class Particle {
                 this.space.getConfig().velocityCap
             );
         }
+
+        this.velocity = vector.multiply(this.velocity, 1 - this.space.getConfig().viscosity);
 
         this.position = vector.sum(
             this.position,

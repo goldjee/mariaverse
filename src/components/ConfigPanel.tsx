@@ -107,17 +107,17 @@ const ConfigPanel: React.FC = observer(() => {
                             }
                         />
                     </ConfigEntry>
-                    <ConfigEntry label="Потери энергии">
+                    <ConfigEntry label="Вязкость среды">
                         <Slider
                             scale={(v) => 10 ** v}
                             step={1}
                             min={-10}
                             max={0}
-                            value={Math.log10(config.energyDissipationFactor)}
+                            value={Math.log10(config.viscosity)}
                             onChange={(value) =>
                                 onChange(
                                     Math.pow(10, value),
-                                    'energyDissipationFactor'
+                                    'viscosity'
                                 )
                             }
                         />

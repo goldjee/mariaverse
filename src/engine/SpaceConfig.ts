@@ -18,7 +18,7 @@ export interface SpaceConfig {
     forceDistanceCap: number;
     hasAsymmetricInteractions: boolean;
 
-    energyDissipationFactor: number;
+    viscosity: number;
 
     slowMoFactor: number;
 }
@@ -44,7 +44,7 @@ export const DEFAULT_CONFIG = {
     forceDistanceCap: 1500,
     hasAsymmetricInteractions: true,
 
-    energyDissipationFactor: 1e-6,
+    viscosity: 1e-1,
 
     slowMoFactor: 1e-3,
 } as SpaceConfig;
