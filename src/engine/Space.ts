@@ -250,16 +250,24 @@ class Space {
                     const wallRepel = -1 * Math.abs(this.config.wallAffinity);
                     const wallRepelForces: Vector[] = [];
                     if (Math.abs(left.x) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(this.getForce(left, wallRepel));
+                        wallRepelForces.push(
+                            this.getForce(left, modulus(left), wallRepel)
+                        );
 
                     if (Math.abs(right.x) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(this.getForce(right, wallRepel));
+                        wallRepelForces.push(
+                            this.getForce(right, modulus(right), wallRepel)
+                        );
 
                     if (Math.abs(top.y) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(this.getForce(top, wallRepel));
+                        wallRepelForces.push(
+                            this.getForce(top, modulus(top), wallRepel)
+                        );
 
                     if (Math.abs(bottom.y) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(this.getForce(bottom, wallRepel));
+                        wallRepelForces.push(
+                            this.getForce(bottom, modulus(bottom), wallRepel)
+                        );
 
                     wallRepelForces.forEach((force) =>
                         particle.applyForce(force)
@@ -317,18 +325,21 @@ class Space {
         }
     }
 
-    private getForce(r: Vector, affinityA: number, affinityB?: number): Vector {
-        let d = modulus(r);
-
+    private getForce(
+        r: Vector,
+        d: number,
+        affinityA: number,
+        affinityB?: number
+    ): Vector {
         const flattenDistance = 1e-6;
         d = d <= flattenDistance ? flattenDistance : d;
 
         const resultAffinity = !affinityB
-            ? Math.sign(affinityA) * Math.abs(affinityA * affinityA)
+            ? sign(affinityA) * Math.abs(affinityA * affinityA)
             : affinityA * affinityB;
         const coefficient =
             Math.abs(resultAffinity) *
-            (Math.sign(resultAffinity) / d - 1 / d ** 3);
+            (sign(resultAffinity) / d - 1 / d ** 3);
 
         return multiply(r, coefficient);
     }
@@ -352,30 +363,28 @@ class Space {
                 });
             }
 
-            merge(attractors
-                .filter(
-                    (attractor) =>
-                        modulus(subtract(probe.position, attractor.position)) <=
-                        this.config.forceDistanceCap
-                ))
-                .forEach((attractor) => {
-                    const r = subtract(probe.position, attractor.position);
-                    const affinityA = this.getAffinity(
-                        probe.type,
-                        attractor.type
-                    );
-                    const affinityB = this.config.hasAsymmetricInteractions
-                        ? undefined
-                        : this.getAffinity(attractor.type, probe.type);
+            merge(attractors).forEach((attractor) => {
+                const r = subtract(probe.position, attractor.position);
+                const d = modulus(r);
+                if (d > this.config.forceDistanceCap) return;
 
-                    const force = multiply(
-                        this.getForce(r, affinityA, affinityB),
-                        attractor.weight
-                    );
-                    probe.applyForce(force);
-                });
+                const affinityA = this.getAffinity(probe.type, attractor.type);
+                const affinityB = this.config.hasAsymmetricInteractions
+                    ? undefined
+                    : this.getAffinity(attractor.type, probe.type);
+
+                const force = multiply(
+                    this.getForce(r, d, affinityA, affinityB),
+                    attractor.weight
+                );
+                probe.applyForce(force);
+            });
         });
     }
+}
+
+function sign(x: number) {
+    return x ? (x < 0 ? -1 : 1) : x === x ? 0 : NaN;
 }
 
 export default Space;
