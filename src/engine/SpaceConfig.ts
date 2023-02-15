@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG = {
     affinityMin: -100,
     affinityMax: 100,
 
-    wallAffinity: -50,
+    wallAffinity: -1e2,
 
     velocityCap: 2700,
     velocityMax: 2700 / 40,
@@ -44,7 +44,7 @@ export const DEFAULT_CONFIG = {
     forceDistanceCap: 1500,
     hasAsymmetricInteractions: true,
 
-    viscosity: 1e-1,
+    viscosity: 1e-9,
 
     slowMoFactor: 1e-3,
 } as SpaceConfig;

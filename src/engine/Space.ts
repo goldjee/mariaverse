@@ -25,13 +25,10 @@ class Space {
 
     constructor(config?: SpaceConfig) {
         this.config = config || DEFAULT_CONFIG;
-        this.gridSize = Math.max(
-            Math.ceil(
-                (Math.max(this.config.sizeX, this.config.sizeY) /
-                    this.config.forceDistanceCap) *
-                    2
-            ),
-            20
+        this.gridSize = Math.ceil(
+            (Math.max(this.config.sizeX, this.config.sizeY) /
+                this.config.forceDistanceCap) *
+                2
         );
 
         this.recreateParticleProperties();
@@ -186,13 +183,10 @@ class Space {
             this.config.sizeX !== config.sizeX ||
             this.config.sizeY !== config.sizeY;
         this.config = config;
-        this.gridSize = Math.max(
-            Math.ceil(
-                (Math.max(this.config.sizeX, this.config.sizeY) /
-                    this.config.forceDistanceCap) *
-                    2
-            ),
-            20
+        this.gridSize = Math.ceil(
+            (Math.max(this.config.sizeX, this.config.sizeY) /
+                this.config.forceDistanceCap) *
+                2
         );
 
         if (isDimensionsChanged) {
@@ -358,11 +352,11 @@ class Space {
         affinityA: number,
         affinityB?: number
     ): Vector {
-        const flattenDistance = 1e-6;
+        const flattenDistance = 1e-4;
         d = d <= flattenDistance ? flattenDistance : d;
 
         const resultAffinity = !affinityB
-            ? sign(affinityA) * Math.abs(affinityA * affinityA)
+            ? sign(affinityA) * (affinityA ** 2)
             : affinityA * affinityB;
         const coefficient =
             Math.abs(resultAffinity) * (sign(resultAffinity) / d - 1 / d ** 3);
