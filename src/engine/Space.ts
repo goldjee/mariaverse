@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Attractor, { merge } from './Attractor';
 import {
     Affinity,
     Particle,
@@ -9,7 +10,7 @@ import {
 import { rnd } from './random';
 import Sector from './Sector';
 import { DEFAULT_CONFIG, SpaceConfig } from './SpaceConfig';
-import Vector, { modulus, multiply, subtract, ZERO } from './Vector';
+import Vector, { modulus, multiply, subtract } from './Vector';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
 
@@ -24,10 +25,13 @@ class Space {
 
     constructor(config?: SpaceConfig) {
         this.config = config || DEFAULT_CONFIG;
-        this.gridSize = Math.ceil(
-            (Math.max(this.config.sizeX, this.config.sizeY) /
-                this.config.forceDistanceCap) *
-                2
+        this.gridSize = Math.max(
+            Math.ceil(
+                (Math.max(this.config.sizeX, this.config.sizeY) /
+                    this.config.forceDistanceCap) *
+                    2
+            ),
+            20
         );
 
         this.recreateParticleProperties();
@@ -51,15 +55,19 @@ class Space {
         }
 
         // populating neighbors
+        const offsetX =
+            sectorSizeX * Math.ceil(this.config.forceDistanceCap / sectorSizeX);
+        const offsetY =
+            sectorSizeY * Math.ceil(this.config.forceDistanceCap / sectorSizeY);
         this.sectors.forEach((sector) => {
             for (
-                let x = sector.center.x - sectorSizeX;
-                x <= sector.center.x + sectorSizeX;
+                let x = sector.center.x - offsetX;
+                x <= sector.center.x + offsetX;
                 x += sectorSizeX
             ) {
                 for (
-                    let y = sector.center.y - sectorSizeY;
-                    y <= sector.center.y + sectorSizeY;
+                    let y = sector.center.y - offsetY;
+                    y <= sector.center.y + offsetY;
                     y += sectorSizeY
                 ) {
                     const neighbor = this.findSector({ x, y });
@@ -178,10 +186,13 @@ class Space {
             this.config.sizeX !== config.sizeX ||
             this.config.sizeY !== config.sizeY;
         this.config = config;
-        this.gridSize = Math.ceil(
-            (Math.max(this.config.sizeX, this.config.sizeY) /
-                this.config.forceDistanceCap) *
-                2
+        this.gridSize = Math.max(
+            Math.ceil(
+                (Math.max(this.config.sizeX, this.config.sizeY) /
+                    this.config.forceDistanceCap) *
+                    2
+            ),
+            20
         );
 
         if (isDimensionsChanged) {
@@ -309,78 +320,60 @@ class Space {
     private getForce(r: Vector, affinityA: number, affinityB?: number): Vector {
         let d = modulus(r);
 
-        if (d <= this.config.forceDistanceCap) {
-            const flattenDistance = 1e-6;
-            d = d <= flattenDistance ? flattenDistance : d;
+        const flattenDistance = 1e-6;
+        d = d <= flattenDistance ? flattenDistance : d;
 
-            const coefficient =
-                (!affinityB
-                    ? Math.sign(affinityA) * Math.abs(affinityA * affinityA)
-                    : affinityA * affinityB) / d;
+        const resultAffinity = !affinityB
+            ? Math.sign(affinityA) * Math.abs(affinityA * affinityA)
+            : affinityA * affinityB;
+        const coefficient =
+            Math.abs(resultAffinity) *
+            (Math.sign(resultAffinity) / d - 1 / d ** 3);
 
-            return multiply(r, coefficient);
-        } else return ZERO;
+        return multiply(r, coefficient);
     }
 
     private applyForceField(probe: Particle, neighborSectors: Sector[]): void {
         neighborSectors.forEach((sector) => {
             if (sector.isEmpty()) return;
 
-            const attractors: {
-                r: Vector;
-                d: number;
-                affinityA: number;
-                affinityB: number | undefined;
-                multiplier: number;
-            }[] = [];
+            const attractors: Attractor[] = [];
 
             if (!sector.hasParticle(probe)) {
                 particleTypes.forEach((type) => {
-                    const r = subtract(
-                        probe.position,
-                        sector.getChargeCenter(probe.type)
-                    );
-                    attractors.push({
-                        r,
-                        d: modulus(r),
-                        affinityA: this.getAffinity(probe.type, type),
-                        affinityB: this.config.hasAsymmetricInteractions
-                            ? undefined
-                            : this.getAffinity(type, probe.type),
-                        multiplier: sector.getParticles(type).length,
-                    });
+                    const attractor = sector.getAttractor(type);
+                    if (attractor) attractors.push(attractor);
                 });
             } else {
                 const neighbors = sector.getParticles();
 
                 neighbors.forEach((neighbor) => {
-                    const r = subtract(probe.position, neighbor.position);
-                    const d = modulus(r);
-                    if (d > this.config.forceDistanceCap) return;
-
-                    attractors.push({
-                        r,
-                        d: modulus(r),
-                        affinityA: this.getAffinity(probe.type, neighbor.type),
-                        affinityB: this.config.hasAsymmetricInteractions
-                            ? undefined
-                            : this.getAffinity(neighbor.type, probe.type),
-                        multiplier: 1,
-                    });
+                    attractors.push(neighbor.getAttractor());
                 });
             }
 
-            attractors.forEach((attractor) => {
-                const force = multiply(
-                    this.getForce(
-                        attractor.r,
-                        attractor.affinityA,
-                        attractor.affinityB
-                    ),
-                    attractor.multiplier
-                );
-                probe.applyForce(force);
-            });
+            merge(attractors
+                .filter(
+                    (attractor) =>
+                        modulus(subtract(probe.position, attractor.position)) <=
+                        this.config.forceDistanceCap
+                ))
+                .forEach((attractor) => {
+                    const r = subtract(probe.position, attractor.position);
+                    const affinityA = this.getAffinity(
+                        probe.type,
+                        attractor.type
+                    );
+                    const affinityB = this.config.hasAsymmetricInteractions
+                        ? undefined
+                        : this.getAffinity(attractor.type, probe.type);
+
+                    const force = multiply(
+                        this.getForce(r, affinityA, affinityB),
+                        attractor.weight
+                    );
+                    probe.applyForce(force);
+                });
         });
     }
 }

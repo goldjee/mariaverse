@@ -1,3 +1,4 @@
+import Attractor from './Attractor';
 import Space from './Space';
 import Vector, * as vector from './Vector';
 
@@ -44,6 +45,10 @@ export class Particle {
 
     public getAffinity(type: ParticleType): number {
         return this.space.getAffinity(this.type, type);
+    }
+
+    public getAttractor(): Attractor {
+        return new Attractor(this.type, this.position, 1);
     }
 
     public reflect(overshoot: Vector): void {

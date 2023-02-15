@@ -1,13 +1,14 @@
 import _ from 'lodash';
-import { Particle, ParticleType, particleTypes } from './Particle';
-import Vector, { multiply, sum } from './Vector';
+import Attractor, { merge } from './Attractor';
+import { Particle, ParticleType } from './Particle';
+import Vector from './Vector';
 
 class Sector {
     topLeft: Vector;
     bottomRight: Vector;
     center: Vector;
-    chargeCenters: Map<ParticleType, Vector>;
     particles: Map<ParticleType, Particle[]>;
+    attractors: Map<ParticleType, Attractor>;
     count: number;
     neighbors: Sector[] = [];
 
@@ -19,32 +20,26 @@ class Sector {
             x: (topLeft.x + bottomRight.x) / 2,
             y: (topLeft.y + bottomRight.y) / 2,
         } as Vector;
-        this.chargeCenters = new Map<ParticleType, Vector>();
 
         this.particles = new Map<ParticleType, Particle[]>();
+        this.attractors = new Map<ParticleType, Attractor>();
         this.count = 0;
     }
 
-    private updateChargeCenters(type?: ParticleType): void {
-        const types = type ? [type] : particleTypes;
+    public getAttractor(type: ParticleType): Attractor | undefined {
+        return this.attractors.get(type);
+    }
 
-        this.particles.forEach((particles, type) => {
-            if (types.includes(type)) {
-                if (particles.length === 0) {
-                    this.chargeCenters.delete(type);
-                    return;
-                }
+    public updateAttractor(type: ParticleType): void {
+        const particles = this.particles.get(type);
 
-                const positions: Vector[] = particles.map(
-                    (particle) => particle.position
-                );
-                const center = multiply(
-                    sum(...positions),
-                    1 / positions.length
-                );
-                this.chargeCenters.set(type, center);
-            }
-        });
+        if (!particles || particles.length === 0) return undefined;
+
+        const attractors = particles.map((particle) => particle.getAttractor());
+
+        const attractor = merge(attractors).find((attractor) => attractor.type === type);
+        if (!attractor) this.attractors.delete(type);
+        else this.attractors.set(type, attractor);
     }
 
     public getParticles(type?: ParticleType): Particle[] {
@@ -67,7 +62,8 @@ class Sector {
 
         store.push(particle);
         this.count = this.count + 1;
-        this.updateChargeCenters(particle.type);
+
+        this.updateAttractor(particle.type);
     }
 
     public hasParticle(particle: Particle): boolean {
@@ -80,14 +76,12 @@ class Sector {
             _.pull(store, particle);
         }
         this.count = this.count - 1;
+
+        this.updateAttractor(particle.type);
     }
 
     public isEmpty(): boolean {
         return this.count === 0;
-    }
-
-    public getChargeCenter(type: ParticleType): Vector {
-        return this.chargeCenters.get(type) || this.center;
     }
 
     public clear(): void {
