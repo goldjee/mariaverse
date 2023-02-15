@@ -23,7 +23,7 @@ export function merge(attractors: Attractor[]): Attractor[] {
         if (!prevAttractor) return [...prev, currAttractor];
 
         return [
-            ...prev,
+            ...prev.filter((attractor) => attractor !== prevAttractor),
             new Attractor(
                 currAttractor.type,
                 multiply(
