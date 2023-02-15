@@ -74,7 +74,6 @@ class Space {
                     if (neighbor) sector.neighbors.push(neighbor);
                 }
             }
-            sector.neighbors.push(sector);
             sector.neighbors = _.uniq(sector.neighbors);
         });
     }
