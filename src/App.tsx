@@ -9,7 +9,7 @@ import {
     Image,
 } from '@mantine/core';
 import Mariaverse from './components/Mariaverse';
-import ConfigPanel from './components/ConfigPanel';
+import ConfigPanel from './components/config/ConfigPanel';
 import { StoreContext, stores } from './stores/stores';
 import About from './components/About';
 import logo from './logo.svg';

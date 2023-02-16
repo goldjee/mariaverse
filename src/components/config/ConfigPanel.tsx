@@ -14,10 +14,10 @@ import {
 } from '@mantine/core';
 import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
 import { GiWeight } from 'react-icons/gi';
-import { DEFAULT_CONFIG, SpaceConfig } from '../engine/SpaceConfig';
+import { DEFAULT_CONFIG, SpaceConfig } from '../../engine/SpaceConfig';
 import ConfigEntry from './ConfigEntry';
-import { useStore } from '../stores/stores';
-import Circle from './Circle';
+import { useStore } from '../../stores/stores';
+import Circle from '../Circle';
 
 const ConfigPanel: React.FC = observer(() => {
     const { spaceStore } = useStore();
@@ -111,14 +111,17 @@ const ConfigPanel: React.FC = observer(() => {
                     </ConfigEntry>
                     <ConfigEntry label="Вязкость среды">
                         <Slider
-                            scale={(v) => 10 ** v}
-                            step={1}
-                            min={-10}
-                            max={0}
-                            value={Math.log10(config.viscosity)}
-                            onChange={(value) =>
-                                onChange(Math.pow(10, value), 'viscosity')
+                            step={1e-1}
+                            min={1e-9}
+                            max={1}
+                            value={
+                                config.viscosity === 1e-9
+                                    ? config.viscosity
+                                    : Number.parseFloat(
+                                        config.viscosity.toFixed(1)
+                                    )
                             }
+                            onChange={(value) => onChange(value, 'viscosity')}
                         />
                     </ConfigEntry>
                 </Stack>
@@ -195,7 +198,7 @@ const ConfigPanel: React.FC = observer(() => {
                                 min={-100}
                                 max={config.affinityMax}
                                 value={config.affinityMin}
-                                step={0.1}
+                                step={10}
                                 precision={1}
                                 onChange={(value) =>
                                     onChange(value, 'affinityMin')
@@ -207,7 +210,7 @@ const ConfigPanel: React.FC = observer(() => {
                                 min={config.affinityMin}
                                 max={100}
                                 value={config.affinityMax}
-                                step={0.1}
+                                step={10}
                                 precision={1}
                                 onChange={(value) =>
                                     onChange(value, 'affinityMax')
@@ -236,7 +239,7 @@ const ConfigPanel: React.FC = observer(() => {
                     {particleProperties.map((properties) => (
                         <Stack key={properties.type} spacing="xs">
                             <ConfigEntry
-                                icon={
+                                label={
                                     <Title order={6} color={properties.type}>
                                         <Group spacing="sm">
                                             <GiWeight />
@@ -249,14 +252,13 @@ const ConfigPanel: React.FC = observer(() => {
                             </ConfigEntry>
                             {properties.affinities.map((affinity) => (
                                 <ConfigEntry
-                                    icon={
+                                    label={
                                         <Group spacing="sm">
                                             <Circle color={properties.type} />
                                             <Text>→</Text>
                                             <Circle color={affinity.type} />
                                         </Group>
                                     }
-                                    // label={`${properties.type} → ${affinity.type}`}
                                     key={`${properties.type} -> ${affinity.type}`}
                                 >
                                     <Text>{affinity.affinity.toFixed(6)}</Text>
