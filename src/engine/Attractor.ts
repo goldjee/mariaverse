@@ -14,27 +14,24 @@ class Attractor {
 }
 
 export function merge(attractors: Attractor[]): Attractor[] {
-    return attractors.reduce((prev: Attractor[], currAttractor) => {
-        const prevAttractor = prev.find(
-            (attractor) => currAttractor.type === attractor.type
-        );
-        if (!prevAttractor) return [...prev, currAttractor];
+    const result: Map<ParticleType, Attractor> = new Map();
 
-        return [
-            ...prev.filter((attractor) => attractor !== prevAttractor),
-            new Attractor(
-                currAttractor.type,
-                multiply(
-                    sum(
-                        multiply(prevAttractor.position, prevAttractor.weight),
-                        multiply(currAttractor.position, currAttractor.weight)
-                    ),
-                    1 / (prevAttractor.weight + currAttractor.weight)
+    for (const attractor of attractors) {
+        const prevAttractor = result.get(attractor.type);
+        if (!prevAttractor) result.set(attractor.type, attractor);
+        else {
+            prevAttractor.position = multiply(
+                sum(
+                    multiply(prevAttractor.position, prevAttractor.weight),
+                    multiply(attractor.position, attractor.weight)
                 ),
-                prevAttractor.weight + currAttractor.weight
-            ),
-        ];
-    }, []);
+                1 / (prevAttractor.weight + attractor.weight)
+            );
+            prevAttractor.weight = prevAttractor.weight + attractor.weight;
+        }
+    }
+
+    return [...result.values()];
 }
 
 export default Attractor;

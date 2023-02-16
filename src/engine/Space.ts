@@ -370,16 +370,19 @@ class Space {
         affinityA: number,
         affinityB?: number
     ): Vector {
-        const flattenDistance = 1e-4;
-        d = d <= flattenDistance ? flattenDistance : d;
+        // this is an adaptation of Lennard-Jones potential
+        const ed = 1e2; // equilibrium distance
+        const fd = 1e-4; // flattening distance
+        const m = 1; // primary factor power
+        const n = 2; // repulsion factor power
+        d = d <= fd ? fd : d;
 
         const resultAffinity = !affinityB
             ? sign(affinityA) * affinityA ** 2
             : affinityA * affinityB;
         const coefficient =
-            -1 *
             Math.abs(resultAffinity) *
-            (sign(resultAffinity) / d - 1 / d ** 2);
+            (-1 * sign(resultAffinity) * (ed / d) ** m - (ed / d) ** n);
         // const coefficient = -resultAffinity / d;
 
         return multiply(r, coefficient);
