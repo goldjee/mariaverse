@@ -15,8 +15,6 @@ class Attractor {
 
 export function merge(attractors: Attractor[]): Attractor[] {
     return attractors.reduce((prev: Attractor[], currAttractor) => {
-        if (!prev) return [currAttractor];
-
         const prevAttractor = prev.find(
             (attractor) => currAttractor.type === attractor.type
         );

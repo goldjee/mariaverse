@@ -68,7 +68,12 @@ class Space {
                     y += sectorSizeY
                 ) {
                     const neighbor = this.findSector({ x, y });
-                    if (neighbor && neighbor !== sector)
+                    if (
+                        neighbor &&
+                        neighbor !== sector &&
+                        distance(neighbor.center, sector.center) <=
+                            this.config.forceDistanceCap
+                    )
                         sector.neighbors.push(neighbor);
                 }
             }
@@ -80,12 +85,21 @@ class Space {
         const sectorSizeX = this.config.sizeX / this.gridSize;
         const sectorSizeY = this.config.sizeY / this.gridSize;
 
-        const indexX = Math.ceil(position.x / sectorSizeX) - 1;
-        const indexY = Math.ceil(position.y / sectorSizeY) - 1;
-        const center: Vector = {
-            x: indexX * sectorSizeX + sectorSizeX / 2,
-            y: indexY * sectorSizeY + sectorSizeY / 2,
-        };
+        const index = {
+            x: Math.min(
+                Math.max(Math.floor(position.x / sectorSizeX) - 1, 0),
+                this.gridSize - 1
+            ),
+            y: Math.min(
+                Math.max(Math.floor(position.y / sectorSizeY) - 1, 0),
+                this.gridSize - 1
+            ),
+        } as Vector;
+
+        const center = {
+            x: index.x * sectorSizeX + sectorSizeX / 2,
+            y: index.y * sectorSizeY + sectorSizeY / 2,
+        } as Vector;
         return this.sectors.get(JSON.stringify(center));
     }
 
@@ -151,17 +165,21 @@ class Space {
 
         if (debug) {
             this.addParticle(
-                'green',
+                particleTypes[0],
                 {
-                    x: this.config.sizeX / 2 - 20,
+                    x:
+                        this.config.sizeX / 2 -
+                        this.config.forceDistanceCap / 10,
                     y: this.config.sizeY / 2,
                 },
                 { x: 0, y: 0 }
             );
             this.addParticle(
-                'green',
+                particleTypes[0],
                 {
-                    x: this.config.sizeX / 2 + 20,
+                    x:
+                        this.config.sizeX / 2 +
+                        this.config.forceDistanceCap / 10,
                     y: this.config.sizeY / 2,
                 },
                 { x: 0, y: 0 }
@@ -268,7 +286,7 @@ class Space {
                     const { top, right, bottom, left } =
                         this.getWallProximity(particle);
 
-                    const wallRepel = -1 * Math.abs(this.config.wallAffinity);
+                    const wallRepel = 1 * Math.abs(this.config.wallAffinity); // this is positive because of vector direction
                     const wallRepelForces: Vector[] = [];
                     if (Math.abs(left.x) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
@@ -356,10 +374,13 @@ class Space {
         d = d <= flattenDistance ? flattenDistance : d;
 
         const resultAffinity = !affinityB
-            ? sign(affinityA) * (affinityA ** 2)
+            ? sign(affinityA) * affinityA ** 2
             : affinityA * affinityB;
         const coefficient =
-            -1 * Math.abs(resultAffinity) * (sign(resultAffinity) / d - 1 / d ** 3);
+            -1 *
+            Math.abs(resultAffinity) *
+            (sign(resultAffinity) / d - 1 / d ** 2);
+        // const coefficient = -resultAffinity / d;
 
         return multiply(r, coefficient);
     }
@@ -368,7 +389,7 @@ class Space {
         attractors.forEach((attractor) => {
             const r = subtract(probe.position, attractor.position);
             const d = modulus(r);
-            if (d > this.config.forceDistanceCap) return;
+            // if (d > this.config.forceDistanceCap) return;
 
             const affinityA = this.getAffinity(probe.type, attractor.type);
             const affinityB = this.config.hasAsymmetricInteractions
