@@ -33,12 +33,12 @@ export const DEFAULT_CONFIG = {
     massMin: 0.1,
     massMax: 1.5,
 
-    affinityMin: -100,
-    affinityMax: 100,
+    affinityMin: -10,
+    affinityMax: 10,
 
-    wallAffinity: -1e2,
+    wallAffinity: -10,
 
-    velocityCap: 2700,
+    velocityCap: 4200,
     velocityMax: 2700 / 40,
 
     forceDistanceCap: 1500,

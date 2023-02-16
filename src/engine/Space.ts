@@ -359,7 +359,7 @@ class Space {
             ? sign(affinityA) * (affinityA ** 2)
             : affinityA * affinityB;
         const coefficient =
-            Math.abs(resultAffinity) * (sign(resultAffinity) / d - 1 / d ** 3);
+            -1 * Math.abs(resultAffinity) * (sign(resultAffinity) / d - 1 / d ** 3);
 
         return multiply(r, coefficient);
     }
