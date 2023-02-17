@@ -57,6 +57,7 @@ const ConfigPanel: React.FC = observer(() => {
     }, [spaceStore]);
 
     const repopulate = useCallback(() => {
+        spaceStore.recreateParticleProperties();
         spaceStore.repopulate();
     }, [spaceStore]);
 
