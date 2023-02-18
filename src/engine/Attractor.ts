@@ -34,4 +34,20 @@ export function merge(attractors: Attractor[]): Attractor[] {
     return [...result.values()];
 }
 
+export function exclude(attractor: Attractor, aggregate: Attractor): Attractor {
+    if (attractor.type !== aggregate.type) return aggregate;
+
+    return new Attractor(
+        aggregate.type,
+        sum(
+            aggregate.position,
+            multiply(
+                attractor.position,
+                (-1 * attractor.weight) / aggregate.weight
+            )
+        ),
+        aggregate.weight - attractor.weight
+    );
+}
+
 export default Attractor;

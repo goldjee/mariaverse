@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Attractor, { merge } from './Attractor';
+import Attractor, { exclude, merge } from './Attractor';
 import {
     Affinity,
     Particle,
@@ -248,7 +248,7 @@ class Space {
             this.sectors.forEach((sector) => {
                 if (sector.isEmpty()) return;
 
-                let neighborSectorAttractors: Attractor[] = [];
+                let neighborAttractors: Attractor[] = [];
                 sector.neighbors.forEach((neighbor) => {
                     if (neighbor.isEmpty()) return;
 
@@ -259,23 +259,26 @@ class Space {
                             distance(attractor?.position, sector.center) <=
                                 this.config.forceDistanceCap
                         )
-                            neighborSectorAttractors.push(attractor);
+                            neighborAttractors.push(attractor);
                     });
                 });
-                neighborSectorAttractors = merge(neighborSectorAttractors); // costs accuracy
+                neighborAttractors = merge(neighborAttractors); // costs accuracy
+
+                const localAttractors: Attractor[] = particleTypes
+                    .map((type) => sector.getAttractor(type))
+                    .filter(
+                        (attractor) => attractor !== undefined
+                    ) as Attractor[];
 
                 sector.getParticles().forEach((particle) => {
-                    let sameSectorAttractors: Attractor[] = [];
-                    const neighbors = sector.getParticles();
+                    const attractors: Attractor[] = localAttractors.map(
+                        (attractor) =>
+                            exclude(particle.getAttractor(), attractor)
+                    );
 
-                    neighbors.forEach((neighbor) => {
-                        if (neighbor !== particle)
-                            sameSectorAttractors.push(neighbor.getAttractor());
-                    });
-                    sameSectorAttractors = merge(sameSectorAttractors);
                     this.applyForceField(particle, [
-                        ...neighborSectorAttractors,
-                        ...sameSectorAttractors,
+                        ...neighborAttractors,
+                        ...attractors,
                     ]);
                 });
             });
