@@ -48,7 +48,10 @@ class Space {
                         y: (j + 1) * this.sectorHeight,
                     }
                 );
-                this.sectors.set(JSON.stringify(sector.center), sector);
+                this.sectors.set(
+                    JSON.stringify({ x: i, y: j } as Vector),
+                    sector
+                );
             }
         }
 
@@ -102,12 +105,7 @@ class Space {
                 this.sectorCount - 1
             ),
         } as Vector;
-
-        const center = {
-            x: index.x * this.sectorWidth + this.sectorWidth / 2,
-            y: index.y * this.sectorHeight + this.sectorHeight / 2,
-        } as Vector;
-        return this.sectors.get(JSON.stringify(center));
+        return this.sectors.get(JSON.stringify(index));
     }
 
     /**
@@ -130,8 +128,8 @@ class Space {
     ) {
         if (!position)
             position = {
-                x: rnd() * this.width,
-                y: rnd() * this.height,
+                x: rnd(this.width),
+                y: rnd(this.height),
             } as Vector;
 
         if (!velocity)
