@@ -25,16 +25,21 @@ class Space {
 
     constructor(config?: SpaceConfig) {
         this.config = config || DEFAULT_CONFIG;
-        this.gridSize = Math.ceil(
-            (Math.max(this.config.sizeX, this.config.sizeY) /
-                this.config.forceDistanceCap) *
-                2
-        );
+        this.gridSize = this.calcGridSize();
 
         this.recreateParticleProperties();
         this.sectorize();
         this.repopulate();
         this.isRunning = true;
+    }
+
+    private calcGridSize(): number {
+        const size =
+            Math.max(this.config.sizeX, this.config.sizeY) /
+            this.config.forceDistanceCap;
+
+        if (size === Infinity || size === undefined) return 42;
+        else return 1; //size;
     }
 
     private sectorize() {
@@ -201,11 +206,7 @@ class Space {
             this.config.sizeX !== config.sizeX ||
             this.config.sizeY !== config.sizeY;
         this.config = config;
-        this.gridSize = Math.ceil(
-            (Math.max(this.config.sizeX, this.config.sizeY) /
-                this.config.forceDistanceCap) *
-                2
-        );
+        this.gridSize = this.calcGridSize();
 
         if (isDimensionsChanged) {
             this.sectorize();

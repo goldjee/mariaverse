@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Attractor, { merge } from './Attractor';
+import Attractor, { exclude, merge } from './Attractor';
 import { Particle, ParticleType } from './Particle';
 import Vector from './Vector';
 
@@ -63,7 +63,15 @@ class Sector {
         store.push(particle);
         this.count = this.count + 1;
 
-        this.updateAttractor(particle.type);
+        // this.updateAttractor(particle.type);
+        const attractor = this.getAttractor(particle.type);
+        if (!attractor)
+            this.attractors.set(particle.type, particle.getAttractor());
+        else
+            this.attractors.set(
+                particle.type,
+                merge([attractor, particle.getAttractor()])[0]
+            );
     }
 
     public hasParticle(particle: Particle): boolean {
@@ -77,7 +85,13 @@ class Sector {
         }
         this.count = this.count - 1;
 
-        this.updateAttractor(particle.type);
+        // this.updateAttractor(particle.type);
+        let attractor = this.getAttractor(particle.type);
+        if (!attractor) return;
+        else {
+            attractor = exclude(particle.getAttractor(), attractor);
+            if (attractor.weight === 0) this.attractors.delete(attractor.type);
+        }
     }
 
     public isEmpty(): boolean {
@@ -86,6 +100,7 @@ class Sector {
 
     public clear(): void {
         this.particles = new Map<ParticleType, Particle[]>();
+        this.attractors = new Map<ParticleType, Attractor>();
         this.count = 0;
     }
 }
