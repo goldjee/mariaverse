@@ -7,9 +7,10 @@ export interface Config {
 
     massMin: number;
     massMax: number;
-
     affinityMin: number;
     affinityMax: number;
+    driftPeriod: number; // milliseconds
+
     wallAffinity: number;
 
     velocityCap: number;
@@ -33,9 +34,9 @@ export const DEFAULT_CONFIG = {
 
     massMin: 1,
     massMax: 1,
-
     affinityMin: -10,
     affinityMax: 10,
+    driftPeriod: 5000,
 
     wallAffinity: -10,
 

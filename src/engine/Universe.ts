@@ -17,8 +17,9 @@ const debug = false;
 
 class Universe {
     private config: Config;
-    private particleProperties: ParticleProperties[] = [];
+    public particleProperties: ParticleProperties[] = [];
     private space: Space;
+    private timeSinceLastDrift: number;
     isRunning = false;
 
     constructor(config?: Config) {
@@ -27,6 +28,8 @@ class Universe {
 
         this.setParticleProperties();
         this.repopulate();
+
+        this.timeSinceLastDrift = 0;
         this.isRunning = true;
     }
 
@@ -50,6 +53,21 @@ class Universe {
                 affinities,
             });
         });
+    }
+
+    private driftParticleProperties(): void {
+        for (const property of this.particleProperties) {
+            const newAffinities: Affinity[] = property.affinities.map(
+                (affinity) => ({
+                    type: affinity.type,
+                    affinity:
+                        -1 *
+                        sign(affinity.affinity) *
+                        rnd(this.config.affinityMin, this.config.affinityMax),
+                })
+            );
+            property.affinities = newAffinities;
+        }
     }
 
     private addParticlePool(type: ParticleType) {
@@ -138,8 +156,15 @@ class Universe {
 
             // console.log(`Particles total: ${this.getParticles().length}`);
 
+            if (this.config.driftPeriod && this.config.driftPeriod > 0)
+                if (this.timeSinceLastDrift >= this.config.driftPeriod) {
+                    this.driftParticleProperties();
+                    this.timeSinceLastDrift = 0;
+                }
+
             const sectors = this.space.getSectors(true);
 
+            // particle interactions
             sectors.forEach((sector) => {
                 const neighborAttractors: Attractor[] = [];
                 sector.neighbors.forEach((neighbor) => {
@@ -175,6 +200,7 @@ class Universe {
                 });
             });
 
+            // time step adaptation
             const maxVelocity = Math.max(
                 ...sectors.flatMap((sector) =>
                     sector
@@ -189,6 +215,7 @@ class Universe {
                 this.config.slowMoFactor
             );
 
+            // particle updates
             sectors.forEach((sector) => {
                 sector.getParticles().forEach((particle) => {
                     // repel from walls
@@ -234,6 +261,8 @@ class Universe {
                     }
                 });
             });
+
+            this.timeSinceLastDrift += delta;
         }
     }
 

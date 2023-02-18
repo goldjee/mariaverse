@@ -20,12 +20,12 @@ import { useStore } from '../../stores/stores';
 import Circle from '../Circle';
 
 const ConfigPanel: React.FC = observer(() => {
-    const { universeStore: spaceStore } = useStore();
+    const { universeStore } = useStore();
     const [config, setConfig] = useState<Config>(
-        spaceStore.getConfig() || DEFAULT_CONFIG
+        universeStore.getConfig() || DEFAULT_CONFIG
     );
     const [particleProperties, setParticleProperties] = useState(
-        spaceStore.getParticleProperties()
+        universeStore.universe.particleProperties
     );
 
     const onChange = useCallback(
@@ -36,34 +36,34 @@ const ConfigPanel: React.FC = observer(() => {
                         ...prev,
                         ...{ [key]: value },
                     } as Config;
-                    spaceStore.setConfig(newConfig);
+                    universeStore.setConfig(newConfig);
                     return newConfig;
                 });
             }
         },
-        [config, spaceStore]
+        [config, universeStore]
     );
 
     const reset = useCallback(() => {
-        spaceStore.setConfig();
-        setConfig(spaceStore.getConfig());
-        spaceStore.recreateParticleProperties();
-        spaceStore.repopulate();
-    }, [spaceStore]);
+        universeStore.setConfig();
+        setConfig(universeStore.getConfig());
+        universeStore.recreateParticleProperties();
+        universeStore.repopulate();
+    }, [universeStore]);
 
     const recreateParticleProperties = useCallback(() => {
-        spaceStore.recreateParticleProperties();
-        setParticleProperties(spaceStore.getParticleProperties());
-    }, [spaceStore]);
+        universeStore.recreateParticleProperties();
+        setParticleProperties(universeStore.getParticleProperties());
+    }, [universeStore]);
 
     const repopulate = useCallback(() => {
-        spaceStore.recreateParticleProperties();
-        spaceStore.repopulate();
-    }, [spaceStore]);
+        universeStore.recreateParticleProperties();
+        universeStore.repopulate();
+    }, [universeStore]);
 
     useEffect(() => {
-        spaceStore.universe.setConfig(config);
-    }, [config, spaceStore]);
+        universeStore.universe.setConfig(config);
+    }, [config, universeStore]);
 
     return (
         <Stack align="flex-start" justify="flex-start">
