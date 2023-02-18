@@ -104,7 +104,8 @@ class Universe {
     public setConfig(config: Config) {
         const isDimensionsChanged =
             this.config.sizeX !== config.sizeX ||
-            this.config.sizeY !== config.sizeY;
+            this.config.sizeY !== config.sizeY ||
+            this.config.forceDistanceCap !== config.forceDistanceCap;
         this.config = config;
 
         if (isDimensionsChanged) {
@@ -137,7 +138,9 @@ class Universe {
 
             // console.log(`Particles total: ${this.getParticles().length}`);
 
-            this.space.getSectors(true).forEach((sector) => {
+            const sectors = this.space.getSectors(true);
+
+            sectors.forEach((sector) => {
                 let neighborAttractors: Attractor[] = [];
                 sector.neighbors.forEach((neighbor) => {
                     if (neighbor.isEmpty()) return;
@@ -173,7 +176,7 @@ class Universe {
                 });
             });
 
-            this.space.getSectors(true).forEach((sector) => {
+            sectors.forEach((sector) => {
                 sector.getParticles().forEach((particle) => {
                     // repel from walls
                     const { top, right, bottom, left } =
