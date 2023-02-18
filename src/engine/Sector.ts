@@ -91,6 +91,7 @@ class Sector {
         else {
             attractor = exclude(particle.getAttractor(), attractor);
             if (attractor.weight === 0) this.attractors.delete(attractor.type);
+            else this.attractors.set(attractor.type, attractor);
         }
     }
 

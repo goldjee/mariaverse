@@ -31,22 +31,22 @@ export const DEFAULT_CONFIG = {
     particleCountMin: 500,
     particleCountMax: 500,
 
-    massMin: 0.1,
-    massMax: 1.5,
+    massMin: 1,
+    massMax: 1,
 
     affinityMin: -10,
     affinityMax: 10,
 
     wallAffinity: -10,
 
-    velocityCap: 42e4,
+    velocityCap: 72e2,
     velocityMax: 2700 / 40,
 
     forceDistanceCap: 1500,
     hasAsymmetricInteractions: true,
 
-    viscosity: 1e-9,
+    viscosity: 0.3,
 
-    slowMoFactor: 1e-4,
+    slowMoFactor: 1e-3,
     desiredPrecision: 1e2,
 } as Config;

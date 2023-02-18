@@ -26,12 +26,11 @@ class Space {
 
         let size = Math.ceil(
             Math.max(this.width, this.height) /
-                universe.getConfig().forceDistanceCap /
+                universe.getConfig().forceDistanceCap *
                 7
         );
 
         if (size === Infinity || size === undefined) size = 42;
-        //else size = 1; // FIXME: size;
         this.sectorCount = size;
 
         // dividing the space into sectors

@@ -1,4 +1,4 @@
-import Attractor, { exclude, merge } from './Attractor';
+import Attractor, { exclude } from './Attractor';
 import {
     Affinity,
     Particle,
@@ -141,7 +141,7 @@ class Universe {
             const sectors = this.space.getSectors(true);
 
             sectors.forEach((sector) => {
-                let neighborAttractors: Attractor[] = [];
+                const neighborAttractors: Attractor[] = [];
                 sector.neighbors.forEach((neighbor) => {
                     if (neighbor.isEmpty()) return;
 
@@ -155,7 +155,6 @@ class Universe {
                             neighborAttractors.push(attractor);
                     });
                 });
-                neighborAttractors = merge(neighborAttractors); // costs accuracy
 
                 const localAttractors: Attractor[] = particleTypes
                     .map((type) => sector.getAttractor(type))
@@ -186,6 +185,7 @@ class Universe {
             );
             const timeDilation = Math.min(
                 this.config.desiredPrecision / (maxVelocity * delta),
+                // 1,
                 this.config.slowMoFactor
             );
 
@@ -265,7 +265,7 @@ class Universe {
         attractors.forEach((attractor) => {
             const r = subtract(probe.position, attractor.position);
             const d = modulus(r);
-            // if (d > this.config.forceDistanceCap) return;
+            if (d > this.config.forceDistanceCap) return;
 
             const affinityA = this.getAffinity(probe.type, attractor.type);
             const affinityB = this.config.hasAsymmetricInteractions
