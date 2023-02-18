@@ -176,6 +176,19 @@ class Universe {
                 });
             });
 
+            const maxVelocity = Math.max(
+                ...sectors.flatMap((sector) =>
+                    sector
+                        .getParticles()
+                        .map((particle) => modulus(particle.velocity))
+                ),
+                1e-6
+            );
+            const timeDilation = Math.min(
+                this.config.desiredPrecision / (maxVelocity * delta),
+                this.config.slowMoFactor
+            );
+
             sectors.forEach((sector) => {
                 sector.getParticles().forEach((particle) => {
                     // repel from walls
@@ -208,7 +221,8 @@ class Universe {
                         particle.applyForce(force)
                     );
 
-                    particle.move(delta * this.config.slowMoFactor);
+                    // particle.move(delta * this.config.slowMoFactor);
+                    particle.move(delta * timeDilation);
 
                     // reflect from walls
                     this.space.fixParticlePosition(particle);

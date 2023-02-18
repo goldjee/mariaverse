@@ -21,6 +21,7 @@ export interface Config {
     viscosity: number;
 
     slowMoFactor: number;
+    desiredPrecision: number;
 }
 
 export const DEFAULT_CONFIG = {
@@ -47,4 +48,5 @@ export const DEFAULT_CONFIG = {
     viscosity: 1e-9,
 
     slowMoFactor: 1e-4,
+    desiredPrecision: 1e2,
 } as Config;
