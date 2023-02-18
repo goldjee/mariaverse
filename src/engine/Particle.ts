@@ -1,5 +1,5 @@
 import Attractor from './Attractor';
-import Space from './Space';
+import Universe from './Universe';
 import Vector, * as vector from './Vector';
 
 export const particleTypes = [
@@ -26,14 +26,14 @@ export interface ParticleProperties {
 }
 
 export class Particle {
-    space: Space;
+    space: Universe;
     type: ParticleType;
     position: Vector;
     velocity: Vector;
     force: Vector;
 
     constructor(
-        space: Space,
+        space: Universe,
         type: ParticleType,
         position: Vector,
         velocity: Vector

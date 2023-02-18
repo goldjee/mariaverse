@@ -1,4 +1,4 @@
-export interface SpaceConfig {
+export interface Config {
     sizeX: number;
     sizeY: number;
 
@@ -38,7 +38,7 @@ export const DEFAULT_CONFIG = {
 
     wallAffinity: -10,
 
-    velocityCap: 4200,
+    velocityCap: 42e4,
     velocityMax: 2700 / 40,
 
     forceDistanceCap: 1500,
@@ -46,5 +46,5 @@ export const DEFAULT_CONFIG = {
 
     viscosity: 1e-9,
 
-    slowMoFactor: 1e-3,
-} as SpaceConfig;
+    slowMoFactor: 1e-4,
+} as Config;

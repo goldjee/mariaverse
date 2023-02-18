@@ -1,9 +1,9 @@
 import React from 'react';
 
-import SpaceStore from './SpaceStore';
+import UniverseStore from './UniverseStore';
 
 export const stores = {
-    spaceStore: new SpaceStore(),
+    universeStore: new UniverseStore(),
 };
 
 export const StoreContext = React.createContext(stores);

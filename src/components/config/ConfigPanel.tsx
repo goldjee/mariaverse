@@ -14,14 +14,14 @@ import {
 } from '@mantine/core';
 import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
 import { GiWeight } from 'react-icons/gi';
-import { DEFAULT_CONFIG, SpaceConfig } from '../../engine/SpaceConfig';
+import { DEFAULT_CONFIG, Config } from '../../engine/Config';
 import ConfigEntry from './ConfigEntry';
 import { useStore } from '../../stores/stores';
 import Circle from '../Circle';
 
 const ConfigPanel: React.FC = observer(() => {
-    const { spaceStore } = useStore();
-    const [config, setConfig] = useState<SpaceConfig>(
+    const { universeStore: spaceStore } = useStore();
+    const [config, setConfig] = useState<Config>(
         spaceStore.getConfig() || DEFAULT_CONFIG
     );
     const [particleProperties, setParticleProperties] = useState(
@@ -35,7 +35,7 @@ const ConfigPanel: React.FC = observer(() => {
                     const newConfig = {
                         ...prev,
                         ...{ [key]: value },
-                    } as SpaceConfig;
+                    } as Config;
                     spaceStore.setConfig(newConfig);
                     return newConfig;
                 });
@@ -62,7 +62,7 @@ const ConfigPanel: React.FC = observer(() => {
     }, [spaceStore]);
 
     useEffect(() => {
-        spaceStore.space.setConfig(config);
+        spaceStore.universe.setConfig(config);
     }, [config, spaceStore]);
 
     return (

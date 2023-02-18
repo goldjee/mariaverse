@@ -10,7 +10,7 @@ import { useStore } from '../stores/stores';
 */
 
 const Mariaverse: React.FC = observer(() => {
-    const { spaceStore } = useStore();
+    const { universeStore: spaceStore } = useStore();
     const parent = useRef(null);
     const [size, setSize] = useState({
         width: 0,
@@ -83,18 +83,18 @@ const Mariaverse: React.FC = observer(() => {
             const timeNow = Date.now();
             const deltaTime = timeNow - lastRenderTimeRef.current;
 
-            void spaceStore.space.update(deltaTime);
+            void spaceStore.universe.update(deltaTime);
 
             // rendering
             clearBackground(context);
-            spaceStore.space.getParticles().map((particle) => {
+            spaceStore.universe.getParticles().map((particle) => {
                 drawParticle(context, particle);
             });
 
             lastRenderTimeRef.current = timeNow;
         }
         animationFrameRequestRef.current = requestAnimationFrame(renderFrame);
-    }, [clearBackground, drawParticle, spaceStore.space]);
+    }, [clearBackground, drawParticle, spaceStore.universe]);
 
     useEffect(() => {
         setCanvasDimensions();

@@ -1,49 +1,49 @@
 import { makeAutoObservable } from 'mobx';
 import { ParticleProperties } from '../engine/Particle';
-import Space from '../engine/Space';
-import { DEFAULT_CONFIG, SpaceConfig } from '../engine/SpaceConfig';
+import Universe from '../engine/Universe';
+import { DEFAULT_CONFIG, Config } from '../engine/Config';
 
 class SpaceStore {
-    public space: Space;
+    public universe: Universe;
 
     constructor() {
         const config = this.loadConfig();
-        this.space = new Space(config);
+        this.universe = new Universe(config);
         this.saveConfig(config);
         makeAutoObservable(this);
     }
 
-    private loadConfig(): SpaceConfig {
+    private loadConfig(): Config {
         const configString = localStorage.getItem('config');
         if (!configString) return DEFAULT_CONFIG;
 
         return JSON.parse(configString);
     }
 
-    private saveConfig(config: SpaceConfig): void {
+    private saveConfig(config: Config): void {
         localStorage.setItem('config', JSON.stringify(config));
     }
 
-    public setConfig(config?: SpaceConfig): void {
+    public setConfig(config?: Config): void {
         config = config || DEFAULT_CONFIG;
-        this.space.setConfig(config);
+        this.universe.setConfig(config);
         this.saveConfig(config);
     }
 
-    public getConfig(): SpaceConfig {
-        return this.space.getConfig();
+    public getConfig(): Config {
+        return this.universe.getConfig();
     }
 
     public getParticleProperties(): ParticleProperties[] {
-        return this.space.getParticleProperties();
+        return this.universe.getParticleProperties();
     }
 
     public recreateParticleProperties(): void {
-        this.space.recreateParticleProperties();
+        this.universe.setParticleProperties();
     }
 
     public repopulate(): void {
-        this.space.repopulate();
+        this.universe.repopulate();
     }
 }
 
