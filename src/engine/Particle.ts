@@ -26,84 +26,87 @@ export interface ParticleProperties {
 }
 
 export class Particle {
-    space: Universe;
-    type: ParticleType;
-    position: Vector;
-    velocity: Vector;
-    force: Vector;
+    private _universe: Universe;
+    private _type: ParticleType;
+    private _position: Vector;
+    private _velocity: Vector;
+    private _force: Vector;
 
     constructor(
-        space: Universe,
+        universe: Universe,
         type: ParticleType,
         position: Vector,
         velocity: Vector
     ) {
-        this.space = space;
-        this.type = type;
-        this.position = position;
-        this.velocity = velocity;
-        this.force = vector.ZERO;
+        this._universe = universe;
+        this._type = type;
+        this._position = position;
+        this._velocity = velocity;
+        this._force = vector.ZERO();
     }
 
-    public getMass(): number {
-        const properties = this.space
+    public get type(): ParticleType {
+        return this._type;
+    }
+    public get position(): Vector {
+        return this._position;
+    }
+    public get velocity(): Vector {
+        return this._velocity;
+    }
+    public get force(): Vector {
+        return this._force;
+    }
+
+    public get mass(): number {
+        const properties = this._universe
             .getParticleProperties()
-            .find((property) => property.type === this.type);
+            .find((property) => property.type === this._type);
         return properties?.mass || 0;
     }
 
     public getAffinity(type: ParticleType): number {
-        return this.space.getAffinity(this.type, type);
+        return this._universe.getAffinity(this._type, type);
     }
 
     public getAttractor(): Attractor {
-        return new Attractor(this.type, this.position, 1);
+        return new Attractor(this._type, this._position, 1);
     }
 
     public reflect(overshoot: Vector): void {
-        this.position = vector.sum(
-            this.position,
-            vector.multiply(overshoot, 2)
-        );
+        this._position.add(overshoot.copy().multiply(2));
 
-        if (overshoot.x != 0)
-            this.velocity = vector.reflect(this.velocity, 'x');
-        if (overshoot.y != 0)
-            this.velocity = vector.reflect(this.velocity, 'y');
+        if (overshoot.x != 0) this._velocity.reflect('x');
+        if (overshoot.y != 0) this._velocity.reflect('y');
     }
 
     public applyForce(force: Vector): void {
-        this.force = vector.sum(this.force, force);
+        this._force.add(force);
     }
 
     public move(delta: number): void {
-        const mass = this.getMass();
-        const acceleration =
-            mass !== 0 ? vector.multiply(this.force, 1 / mass) : vector.ZERO;
+        const mass = this.mass;
+        const acceleration: Vector =
+            mass !== 0 ? this._force.copy().multiply(1 / mass) : vector.ZERO();
 
-        this.velocity = vector.sum(
-            this.velocity,
-            vector.multiply(acceleration, delta)
-        );
+        // accelerate particle
+        this._velocity.add(acceleration.copy().multiply(delta));
 
-        const velocityModulus = vector.modulus(this.velocity);
-        if (velocityModulus >= this.space.getConfig().velocityCap) {
-            this.velocity = vector.multiply(
-                vector.normalize(this.velocity),
-                this.space.getConfig().velocityCap
-            );
+        // check if the particle velocity exceeded light speed
+        const velocityModulus = this._velocity.modulus();
+        if (velocityModulus >= this._universe.getConfig().velocityCap) {
+            this._velocity
+                .normalize()
+                .multiply(this._universe.getConfig().velocityCap);
         }
 
-        this.velocity = vector.multiply(
-            this.velocity,
-            1 - this.space.getConfig().viscosity
-        );
+        // apply viscosity
+        this._velocity.multiply(1 - this._universe.getConfig().viscosity);
 
-        this.position = vector.sum(
-            this.position,
-            vector.multiply(this.velocity, delta)
-        );
+        // move the particle
+        this._position.add(this._velocity.copy().multiply(delta));
 
-        this.force = vector.ZERO;
+        // nullify forces
+        this._force = vector.ZERO();
     }
 }

@@ -16,10 +16,10 @@ class Sector {
         this.topLeft = topLeft;
         this.bottomRight = bottomRight;
 
-        this.center = {
-            x: (topLeft.x + bottomRight.x) / 2,
-            y: (topLeft.y + bottomRight.y) / 2,
-        } as Vector;
+        this.center = new Vector(
+            (topLeft.x + bottomRight.x) / 2,
+            (topLeft.y + bottomRight.y) / 2
+        );
 
         this.particles = new Map<ParticleType, Particle[]>();
         this.attractors = new Map<ParticleType, Attractor>();
@@ -37,7 +37,9 @@ class Sector {
 
         const attractors = particles.map((particle) => particle.getAttractor());
 
-        const attractor = merge(attractors).find((attractor) => attractor.type === type);
+        const attractor = merge(attractors).find(
+            (attractor) => attractor.type === type
+        );
         if (!attractor) this.attractors.delete(type);
         else this.attractors.set(type, attractor);
     }
@@ -86,12 +88,12 @@ class Sector {
         this.count = this.count - 1;
 
         // this.updateAttractor(particle.type);
-        let attractor = this.getAttractor(particle.type);
+        const attractor = this.getAttractor(particle.type);
         if (!attractor) return;
         else {
-            attractor = exclude(particle.getAttractor(), attractor);
-            if (attractor.weight === 0) this.attractors.delete(attractor.type);
-            else this.attractors.set(attractor.type, attractor);
+            const newAttractor = exclude(particle.getAttractor(), attractor);
+            if (!newAttractor) this.attractors.delete(attractor.type);
+            else this.attractors.set(attractor.type, newAttractor);
         }
     }
 

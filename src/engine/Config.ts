@@ -9,7 +9,7 @@ export interface Config {
     massMax: number;
     affinityMin: number;
     affinityMax: number;
-    driftPeriod: number; // milliseconds
+    driftPeriod?: number; // milliseconds
 
     wallAffinity: number;
 
@@ -23,6 +23,8 @@ export interface Config {
 
     slowMoFactor: number;
     desiredPrecision: number;
+
+    isDebug?: boolean;
 }
 
 export const DEFAULT_CONFIG = {
@@ -36,7 +38,7 @@ export const DEFAULT_CONFIG = {
     massMax: 1,
     affinityMin: -10,
     affinityMax: 10,
-    driftPeriod: 5000,
+    driftPeriod: 10e3,
 
     wallAffinity: -10,
 
@@ -50,4 +52,6 @@ export const DEFAULT_CONFIG = {
 
     slowMoFactor: 1e-3,
     desiredPrecision: 1e2,
+
+    isDebug: false,
 } as Config;

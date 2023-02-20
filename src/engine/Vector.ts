@@ -1,61 +1,122 @@
-interface Vector {
-    x: number;
-    y: number;
+export class Vector {
+    public x: number;
+    public y: number;
+
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * @returns Copy of this vector
+     */
+    public copy(): Vector {
+        return new Vector(this.x, this.y);
+    }
+
+    /**
+     * @returns Modulus of this vector
+     */
+    public modulus(): number {
+        return (this.x * this.x + this.y * this.y) ** 0.5;
+    }
+
+    /**
+     * Adds a vector to this vector
+     * @param vector Vector to add
+     * @returns Mutated vector
+     */
+    public add(vector: Vector): Vector {
+        this.x += vector.x;
+        this.y += vector.y;
+        return this;
+    }
+
+    /**
+     * Subtracts a vector from this vector
+     * @param vector Vector to subtract
+     * @returns Mutated vector
+     */
+    public subtract(vector: Vector): Vector {
+        this.x -= vector.x;
+        this.y -= vector.y;
+        return this;
+    }
+
+    /**
+     * Multiplies this vector by a given value
+     * @param coefficient Multiplicator
+     * @returns Mutated vector
+     */
+    public multiply(coefficient: number): Vector {
+        this.x *= coefficient;
+        this.y *= coefficient;
+        return this;
+    }
+
+    /**
+     * Reflects this vector against coordinate axis
+     * @param direction Axis to reflect against
+     * @returns Mutated vector
+     */
+    public reflect(direction: Direction): Vector {
+        switch (direction) {
+            case 'x':
+                this.x *= -1;
+                return this;
+            case 'y':
+                this.y *= -1;
+                return this;
+            case 'xy':
+                this.reflect('x').reflect('y');
+                return this;
+        }
+    }
+
+    /**
+     * Normalizes this vector
+     * @returns Mutated vector
+     */
+    public normalize(): Vector {
+        const scale = this.modulus();
+        if (scale === 0) return this;
+
+        this.x /= scale;
+        this.y /= scale;
+        return this;
+    }
 }
 
 export type Direction = 'x' | 'y' | 'xy';
 
-export const ZERO = {x: 0, y: 0};
-
-export function modulus(vector: Vector): number {
-    return (vector.x * vector.x + vector.y * vector.y) ** .5;
+export function ZERO(): Vector {
+    return new Vector(0, 0);
 }
 
-export function sum(...vectors: Vector[]): Vector {
-    let result: Vector = ZERO;
+/**
+ * Calculates sum of vector array
+ * @param vectors Array of vectors to sum
+ * @returns Vector representing the sum
+ */
+export function sum(vectors: Vector[]): Vector {
+    if (vectors.length === 0) return ZERO();
 
-    if (vectors.length > 0)
-        result = vectors.reduce(
-            (sum, vector) =>
-                (result = { x: sum.x + vector.x, y: sum.y + vector.y }),
-            result
-        );
-
-    return result;
+    const sum = ZERO();
+    vectors.forEach((vector) => {
+        sum.add(vector);
+    });
+    return sum;
 }
 
-export function subtract(vector1: Vector, vector2: Vector): Vector {
-    return {
-        x: vector1.x - vector2.x,
-        y: vector1.y - vector2.y,
-    };
-}
-
-export function multiply(vector: Vector, coefficient: number): Vector {
-    return { x: vector.x * coefficient, y: vector.y * coefficient };
-}
-
-export function distance(pointA: Vector, pointB: Vector): number {
-    return modulus(subtract(pointB, pointA));
-}
-
-export function reflect(vector: Vector, direction: Direction): Vector {
-    switch (direction) {
-        case 'x':
-            return { x: -1 * vector.x, y: vector.y };
-        case 'y':
-            return { x: vector.x, y: -1 * vector.y };
-        case 'xy':
-            return { x: -1 * vector.x, y: -1 * vector.y };
-    }
-}
-
-export function normalize(vector: Vector): Vector {
-    const scale = modulus(vector);
-    return {
-        x: vector.x / scale,
-        y: vector.y / scale,
-    } as Vector;
+/**
+ * Calculates a distance between two points
+ * @param pointA
+ * @param pointB
+ * @returns Vector with start at point A and end at point B
+ */
+export function distance(pointA: Vector, pointB: Vector): Vector {
+    const distance = pointB.copy();
+    return distance.subtract(pointA);
 }
 
 export default Vector;

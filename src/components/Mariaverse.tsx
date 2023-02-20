@@ -60,7 +60,7 @@ const Mariaverse: React.FC = observer(() => {
             drawCircle(
                 context,
                 particle.position,
-                Math.abs(particle.getMass() * 5),
+                Math.abs(particle.mass * 5),
                 particle.type
             );
         },

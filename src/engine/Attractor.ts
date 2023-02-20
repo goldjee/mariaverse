@@ -1,15 +1,35 @@
 import { ParticleType } from './Particle';
-import Vector, { multiply, sum } from './Vector';
+import Vector from './Vector';
 
 class Attractor {
-    type: ParticleType;
-    position: Vector;
-    weight: number;
+    private _type: ParticleType;
+    private _position: Vector;
+    private _weight: number;
+
+    public get type(): ParticleType {
+        return this._type;
+    }
+    public get position(): Vector {
+        return this._position;
+    }
+    public set position(v: Vector) {
+        this._position = v;
+    }
+    public get weight(): number {
+        return this._weight;
+    }
+    public set weight(w: number) {
+        this._weight = w;
+    }
 
     constructor(type: ParticleType, position: Vector, weight: number) {
-        this.type = type;
-        this.position = position;
-        this.weight = weight;
+        this._type = type;
+        this._position = position;
+        this._weight = weight;
+    }
+
+    public copy(): Attractor {
+        return new Attractor(this._type, this._position, this._weight);
     }
 }
 
@@ -18,34 +38,42 @@ export function merge(attractors: Attractor[]): Attractor[] {
 
     for (const attractor of attractors) {
         const prevAttractor = result.get(attractor.type);
-        if (!prevAttractor) result.set(attractor.type, attractor);
-        else {
-            prevAttractor.position = multiply(
-                sum(
-                    multiply(prevAttractor.position, prevAttractor.weight),
-                    multiply(attractor.position, attractor.weight)
-                ),
-                1 / (prevAttractor.weight + attractor.weight)
+        if (!prevAttractor)
+            result.set(
+                attractor.type,
+                new Attractor(
+                    attractor.type,
+                    attractor.position,
+                    attractor.weight
+                )
             );
-            prevAttractor.weight = prevAttractor.weight + attractor.weight;
+        else {
+            prevAttractor.position = prevAttractor.position
+                .copy()
+                .multiply(prevAttractor.weight)
+                .add(attractor.position.copy().multiply(attractor.weight))
+                .multiply(1 / (prevAttractor.weight + attractor.weight));
+            prevAttractor.weight += attractor.weight;
         }
     }
 
     return [...result.values()];
 }
 
-export function exclude(attractor: Attractor, aggregate: Attractor): Attractor {
+export function exclude(
+    attractor: Attractor,
+    aggregate: Attractor
+): Attractor | undefined {
     if (attractor.type !== aggregate.type) return aggregate;
+    if (attractor.weight === aggregate.weight) return undefined;
 
     return new Attractor(
         aggregate.type,
-        sum(
-            aggregate.position,
-            multiply(
-                attractor.position,
-                (-1 * attractor.weight) / aggregate.weight
-            )
-        ),
+        aggregate.position
+            .copy()
+            .multiply(aggregate.weight)
+            .add(attractor.position.copy().multiply(-1 * attractor.weight))
+            .multiply(aggregate.weight - attractor.weight),
         aggregate.weight - attractor.weight
     );
 }

@@ -25,8 +25,8 @@ class Space {
         this.height = universe.getConfig().sizeY;
 
         let size = Math.ceil(
-            Math.max(this.width, this.height) /
-                universe.getConfig().forceDistanceCap *
+            (Math.max(this.width, this.height) /
+                universe.getConfig().forceDistanceCap) *
                 7
         );
 
@@ -41,11 +41,11 @@ class Space {
         for (let i = 0; i < this.sectorCount; i++) {
             for (let j = 0; j < this.sectorCount; j++) {
                 const sector = new Sector(
-                    { x: i * this.sectorWidth, y: j * this.sectorHeight },
-                    {
-                        x: (i + 1) * this.sectorWidth,
-                        y: (j + 1) * this.sectorHeight,
-                    }
+                    new Vector(i * this.sectorWidth, j * this.sectorHeight),
+                    new Vector(
+                        (i + 1) * this.sectorWidth,
+                        (j + 1) * this.sectorHeight
+                    )
                 );
                 this.sectors.set(
                     JSON.stringify({ x: i, y: j } as Vector),
@@ -74,11 +74,11 @@ class Space {
                     y <= sector.center.y + offsetY;
                     y += this.sectorHeight
                 ) {
-                    const neighbor = this.findSector({ x, y });
+                    const neighbor = this.findSector(new Vector(x, y));
                     if (
                         neighbor &&
                         neighbor !== sector &&
-                        distance(neighbor.center, sector.center) <=
+                        distance(neighbor.center, sector.center).modulus() <=
                             universe.getConfig().forceDistanceCap
                     )
                         sector.neighbors.push(neighbor);
@@ -94,16 +94,16 @@ class Space {
      * @returns
      */
     public findSector(position: Vector): Sector | undefined {
-        const index = {
-            x: Math.min(
+        const index = new Vector(
+            Math.min(
                 Math.max(Math.floor(position.x / this.sectorWidth) - 1, 0),
                 this.sectorCount - 1
             ),
-            y: Math.min(
+            Math.min(
                 Math.max(Math.floor(position.y / this.sectorHeight) - 1, 0),
                 this.sectorCount - 1
-            ),
-        } as Vector;
+            )
+        );
         return this.sectors.get(JSON.stringify(index));
     }
 
@@ -125,17 +125,13 @@ class Space {
         position?: Vector,
         velocity?: Vector
     ) {
-        if (!position)
-            position = {
-                x: rnd(this.width),
-                y: rnd(this.height),
-            } as Vector;
+        if (!position) position = new Vector(rnd(this.width), rnd(this.height));
 
         if (!velocity)
-            velocity = {
-                x: this.universe.getConfig().velocityMax * rnd(-1, 1),
-                y: this.universe.getConfig().velocityMax * rnd(-1, 1),
-            } as Vector;
+            velocity = new Vector(
+                this.universe.getConfig().velocityMax * rnd(-1, 1),
+                this.universe.getConfig().velocityMax * rnd(-1, 1)
+            );
 
         const particle = new Particle(this.universe, type, position, velocity);
         const sector = this.findSector(particle.position);
@@ -182,16 +178,10 @@ class Space {
         bottom: Vector;
     } {
         return {
-            top: { x: 0, y: 0 - particle.position.y },
-            left: { x: 0 - particle.position.x, y: 0 },
-            right: {
-                x: this.width - particle.position.x,
-                y: 0,
-            },
-            bottom: {
-                x: 0,
-                y: this.height - particle.position.y,
-            },
+            top: new Vector(0, 0 - particle.position.y),
+            left: new Vector(0 - particle.position.x, 0),
+            right: new Vector(this.width - particle.position.x, 0),
+            bottom: new Vector(0, this.height - particle.position.y),
         };
     }
 

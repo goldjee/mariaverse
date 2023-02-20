@@ -8,18 +8,16 @@ import {
 } from './Particle';
 import { rnd, sign } from './utils';
 import { DEFAULT_CONFIG, Config } from './Config';
-import Vector, { distance, modulus, multiply, subtract } from './Vector';
+import Vector, { distance } from './Vector';
 import Space from './Space';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
 
-const debug = false;
-
 class Universe {
-    private config: Config;
+    protected config: Config;
     public particleProperties: ParticleProperties[] = [];
-    private space: Space;
-    private timeSinceLastDrift: number;
+    protected space: Space;
+    protected timeSinceLastDrift: number;
     isRunning = false;
 
     constructor(config?: Config) {
@@ -40,10 +38,9 @@ class Universe {
             particleTypes.forEach((typeB) => {
                 affinities.push({
                     type: typeB,
-                    affinity: rnd(
-                        this.config.affinityMin,
-                        this.config.affinityMax
-                    ),
+                    affinity: !this.config.isDebug
+                        ? rnd(this.config.affinityMin, this.config.affinityMax)
+                        : 1,
                 });
             });
 
@@ -82,26 +79,22 @@ class Universe {
         this.isRunning = false;
         this.space.dropParticles();
 
-        if (debug) {
+        if (this.config.isDebug) {
             this.space.addParticle(
                 particleTypes[0],
-                {
-                    x:
-                        this.config.sizeX / 2 -
-                        this.config.forceDistanceCap / 10,
-                    y: this.config.sizeY / 2,
-                },
-                { x: 0, y: 0 }
+                new Vector(
+                    this.config.sizeX / 2 - this.config.forceDistanceCap / 10,
+                    this.config.sizeY / 2
+                ),
+                new Vector(0, 0)
             );
             this.space.addParticle(
                 particleTypes[0],
-                {
-                    x:
-                        this.config.sizeX / 2 +
-                        this.config.forceDistanceCap / 10,
-                    y: this.config.sizeY / 2,
-                },
-                { x: 0, y: 0 }
+                new Vector(
+                    this.config.sizeX / 2 + this.config.forceDistanceCap / 10,
+                    this.config.sizeY / 2
+                ),
+                new Vector(0, 0)
             );
         } else {
             particleTypes.forEach((type) => {
@@ -174,8 +167,10 @@ class Universe {
                         const attractor = neighbor.getAttractor(type);
                         if (
                             attractor &&
-                            distance(attractor?.position, sector.center) <=
-                                this.config.forceDistanceCap
+                            distance(
+                                attractor?.position,
+                                sector.center
+                            ).modulus() <= this.config.forceDistanceCap
                         )
                             neighborAttractors.push(attractor);
                     });
@@ -188,10 +183,15 @@ class Universe {
                     ) as Attractor[];
 
                 sector.getParticles().forEach((particle) => {
-                    const attractors: Attractor[] = localAttractors.map(
-                        (attractor) =>
+                    const attractors: Attractor[] = localAttractors
+                        .map((attractor) =>
                             exclude(particle.getAttractor(), attractor)
-                    );
+                        )
+                        .filter(
+                            (attractor): attractor is Attractor =>
+                                attractor !== undefined &&
+                                attractor.weight !== 0
+                        );
 
                     this.applyForceField(particle, [
                         ...neighborAttractors,
@@ -205,7 +205,7 @@ class Universe {
                 ...sectors.flatMap((sector) =>
                     sector
                         .getParticles()
-                        .map((particle) => modulus(particle.velocity))
+                        .map((particle) => particle.velocity.modulus())
                 ),
                 1e-6
             );
@@ -226,22 +226,22 @@ class Universe {
                     const wallRepelForces: Vector[] = [];
                     if (Math.abs(left.x) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(left, modulus(left), wallRepel)
+                            this.getForce(left, left.modulus(), wallRepel)
                         );
 
                     if (Math.abs(right.x) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(right, modulus(right), wallRepel)
+                            this.getForce(right, right.modulus(), wallRepel)
                         );
 
                     if (Math.abs(top.y) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(top, modulus(top), wallRepel)
+                            this.getForce(top, top.modulus(), wallRepel)
                         );
 
                     if (Math.abs(bottom.y) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(bottom, modulus(bottom), wallRepel)
+                            this.getForce(bottom, bottom.modulus(), wallRepel)
                         );
 
                     wallRepelForces.forEach((force) =>
@@ -259,6 +259,10 @@ class Universe {
                         sector.removeParticle(particle);
                         newSector.addParticle(particle);
                     }
+                });
+
+                particleTypes.forEach((type) => {
+                    sector.updateAttractor(type);
                 });
             });
 
@@ -287,13 +291,13 @@ class Universe {
             (-1 * sign(resultAffinity) * (ed / d) ** m - (ed / d) ** n);
         // const coefficient = -resultAffinity / d;
 
-        return multiply(r, coefficient);
+        return r.copy().multiply(coefficient);
     }
 
     private applyForceField(probe: Particle, attractors: Attractor[]): void {
         attractors.forEach((attractor) => {
-            const r = subtract(probe.position, attractor.position);
-            const d = modulus(r);
+            const r = distance(probe.position, attractor.position);
+            const d = r.modulus();
             if (d > this.config.forceDistanceCap) return;
 
             const affinityA = this.getAffinity(probe.type, attractor.type);
@@ -301,8 +305,7 @@ class Universe {
                 ? undefined
                 : this.getAffinity(attractor.type, probe.type);
 
-            const force = multiply(
-                this.getForce(r, d, affinityA, affinityB),
+            const force = this.getForce(r, d, affinityA, affinityB).multiply(
                 attractor.weight
             );
             probe.applyForce(force);
