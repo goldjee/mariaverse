@@ -32,22 +32,12 @@ const config = {
     isDebug: true,
 } as Config;
 
-class UniverseTest extends Universe {
-    constructor(config: Config) {
-        super(config);
-    }
-
-    public getSpace() {
-        return this.space;
-    }
-}
-
-const universe = new UniverseTest(config);
-const space = universe.getSpace();
+const universe = new Universe(config);
+const space = universe.space;
 
 // universe tests
 test('Universe config', () => {
-    expect(universe.getConfig()).toEqual(config);
+    expect(universe.config).toEqual(config);
 });
 
 // space tests
@@ -82,7 +72,7 @@ test('Space sectors division', () => {
     expect((bottomRight as unknown as Vector).y).toBe(config.sizeY);
 });
 
-test('particles creation', () => {
+test('Particles creation', () => {
     const particles = space.getParticles();
     expect(particles.length).toBe(2);
 });

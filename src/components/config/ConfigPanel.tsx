@@ -62,7 +62,7 @@ const ConfigPanel: React.FC = observer(() => {
     }, [universeStore]);
 
     useEffect(() => {
-        universeStore.universe.setConfig(config);
+        universeStore.universe.config = config;
     }, [config, universeStore]);
 
     return (

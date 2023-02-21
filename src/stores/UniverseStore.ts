@@ -26,12 +26,12 @@ class SpaceStore {
 
     public setConfig(config?: Config): void {
         config = config || DEFAULT_CONFIG;
-        this.universe.setConfig(config);
+        this.universe.config = config;
         this.saveConfig(config);
     }
 
     public getConfig(): Config {
-        return this.universe.getConfig();
+        return this.universe.config;
     }
 
     public getParticleProperties(): ParticleProperties[] {

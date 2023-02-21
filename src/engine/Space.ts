@@ -21,12 +21,12 @@ class Space {
         this.universe = universe;
 
         // setting up core space parameters
-        this.width = universe.getConfig().sizeX;
-        this.height = universe.getConfig().sizeY;
+        this.width = universe.config.sizeX;
+        this.height = universe.config.sizeY;
 
         let size = Math.ceil(
             (Math.max(this.width, this.height) /
-                universe.getConfig().forceDistanceCap) *
+                universe.config.forceDistanceCap) *
                 7
         );
 
@@ -57,11 +57,11 @@ class Space {
         // identifying neighbors of the sectors
         const offsetX =
             this.sectorWidth *
-            Math.ceil(universe.getConfig().forceDistanceCap / this.sectorWidth);
+            Math.ceil(universe.config.forceDistanceCap / this.sectorWidth);
         const offsetY =
             this.sectorHeight *
             Math.ceil(
-                universe.getConfig().forceDistanceCap / this.sectorHeight
+                universe.config.forceDistanceCap / this.sectorHeight
             );
         this.sectors.forEach((sector) => {
             for (
@@ -79,7 +79,7 @@ class Space {
                         neighbor &&
                         neighbor !== sector &&
                         distance(neighbor.center, sector.center).modulus() <=
-                            universe.getConfig().forceDistanceCap
+                            universe.config.forceDistanceCap
                     )
                         sector.neighbors.push(neighbor);
                 }
@@ -129,8 +129,8 @@ class Space {
 
         if (!velocity)
             velocity = new Vector(
-                this.universe.getConfig().velocityMax * rnd(-1, 1),
-                this.universe.getConfig().velocityMax * rnd(-1, 1)
+                this.universe.config.velocityMax * rnd(-1, 1),
+                this.universe.config.velocityMax * rnd(-1, 1)
             );
 
         const particle = new Particle(this.universe, type, position, velocity);

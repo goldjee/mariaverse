@@ -14,21 +14,40 @@ import Space from './Space';
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
 
 class Universe {
-    protected config: Config;
+    private _config: Config;
     public particleProperties: ParticleProperties[] = [];
-    protected space: Space;
-    protected timeSinceLastDrift: number;
-    isRunning = false;
+    private _space: Space;
+    private timeSinceLastDrift: number;
+    private isRunning = false;
 
     constructor(config?: Config) {
-        this.config = config || DEFAULT_CONFIG;
-        this.space = new Space(this);
+        this._config = config || DEFAULT_CONFIG;
+        this._space = new Space(this);
 
         this.setParticleProperties();
         this.repopulate();
 
         this.timeSinceLastDrift = 0;
         this.isRunning = true;
+    }
+
+    public get config(): Config {
+        return this._config;
+    }
+    public set config(config: Config) {
+        const isDimensionsChanged =
+            this._config.sizeX !== config.sizeX ||
+            this._config.sizeY !== config.sizeY ||
+            this._config.forceDistanceCap !== config.forceDistanceCap;
+        this._config = config;
+
+        if (isDimensionsChanged) {
+            this.setParticleProperties();
+            this.repopulate();
+        }
+    }
+    public get space(): Space {
+        return this._space;
     }
 
     public setParticleProperties(): void {
@@ -106,23 +125,6 @@ class Universe {
 
     public getParticles(): Particle[] {
         return this.space.getParticles();
-    }
-
-    public getConfig(): Config {
-        return this.config;
-    }
-
-    public setConfig(config: Config) {
-        const isDimensionsChanged =
-            this.config.sizeX !== config.sizeX ||
-            this.config.sizeY !== config.sizeY ||
-            this.config.forceDistanceCap !== config.forceDistanceCap;
-        this.config = config;
-
-        if (isDimensionsChanged) {
-            this.setParticleProperties();
-            this.repopulate();
-        }
     }
 
     public getParticleProperties(): ParticleProperties[] {

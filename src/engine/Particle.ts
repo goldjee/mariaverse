@@ -94,14 +94,14 @@ export class Particle {
 
         // check if the particle velocity exceeded light speed
         const velocityModulus = this._velocity.modulus();
-        if (velocityModulus >= this._universe.getConfig().velocityCap) {
+        if (velocityModulus >= this._universe.config.velocityCap) {
             this._velocity
                 .normalize()
-                .multiply(this._universe.getConfig().velocityCap);
+                .multiply(this._universe.config.velocityCap);
         }
 
         // apply viscosity
-        this._velocity.multiply(1 - this._universe.getConfig().viscosity);
+        this._velocity.multiply(1 - this._universe.config.viscosity);
 
         // move the particle
         this._position.add(this._velocity.copy().multiply(delta));
