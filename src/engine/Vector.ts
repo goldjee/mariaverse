@@ -1,3 +1,5 @@
+import { rnd } from './utils';
+
 export class Vector {
     public x: number;
     public y: number;
@@ -89,8 +91,18 @@ export class Vector {
 
 export type Direction = 'x' | 'y' | 'xy';
 
+/**
+ * Zero vector
+ */
 export function ZERO(): Vector {
     return new Vector(0, 0);
+}
+
+/**
+ * Normalized vector with random directoion
+ */
+export function RANDOM(): Vector {
+    return new Vector(rnd(-1, 1), rnd(-1, 1)).normalize();
 }
 
 /**
@@ -115,8 +127,7 @@ export function sum(vectors: Vector[]): Vector {
  * @returns Vector with start at point A and end at point B
  */
 export function distance(pointA: Vector, pointB: Vector): Vector {
-    const distance = pointB.copy();
-    return distance.subtract(pointA);
+    return pointB.copy().subtract(pointA);
 }
 
 export default Vector;

@@ -32,7 +32,13 @@ const config = {
     isDebug: true,
 } as Config;
 
-const universe = new Universe(config);
+class UniverseWrapper extends Universe {
+    constructor(config: Config) {
+        super(config);
+    }
+}
+
+const universe = new UniverseWrapper(config);
 const space = universe.space;
 
 // universe tests
@@ -105,8 +111,7 @@ test('Particle attractors', () => {
 
 function testPositions() {
     test('Positions of sector attractors', () => {
-        const sectors = space
-            .getSectors(true);
+        const sectors = space.getSectors(true);
         const sectorAttractors: Attractor[] = [];
 
         particleTypes.forEach((type) => {

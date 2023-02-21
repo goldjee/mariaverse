@@ -10,6 +10,7 @@ import { rnd, sign } from './utils';
 import { DEFAULT_CONFIG, Config } from './Config';
 import Vector, { distance } from './Vector';
 import Space from './Space';
+import getForce from './force';
 
 // inspired by https://www.youtube.com/watch?v=0Kx4Y9TVMGg
 
@@ -213,7 +214,6 @@ class Universe {
             );
             const timeDilation = Math.min(
                 this.config.desiredPrecision / (maxVelocity * delta),
-                // 1,
                 this.config.slowMoFactor
             );
 
@@ -224,26 +224,26 @@ class Universe {
                     const { top, right, bottom, left } =
                         this.space.getWallProximity(particle);
 
-                    const wallRepel = 1 * Math.abs(this.config.wallAffinity); // this is positive because of vector direction
+                    const wallRepel = -1 * Math.abs(this.config.wallAffinity); // this is positive because of vector direction
                     const wallRepelForces: Vector[] = [];
                     if (Math.abs(left.x) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(left, left.modulus(), wallRepel)
+                            getForce(left, left.modulus(), wallRepel)
                         );
 
                     if (Math.abs(right.x) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(right, right.modulus(), wallRepel)
+                            getForce(right, right.modulus(), wallRepel)
                         );
 
                     if (Math.abs(top.y) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(top, top.modulus(), wallRepel)
+                            getForce(top, top.modulus(), wallRepel)
                         );
 
                     if (Math.abs(bottom.y) <= this.config.forceDistanceCap)
                         wallRepelForces.push(
-                            this.getForce(bottom, bottom.modulus(), wallRepel)
+                            getForce(bottom, bottom.modulus(), wallRepel)
                         );
 
                     wallRepelForces.forEach((force) =>
@@ -272,30 +272,6 @@ class Universe {
         }
     }
 
-    private getForce(
-        r: Vector,
-        d: number,
-        affinityA: number,
-        affinityB?: number
-    ): Vector {
-        // this is an adaptation of Lennard-Jones potential
-        const ed = 1e2; // equilibrium distance
-        const fd = 1e-4; // flattening distance
-        const m = 1; // primary factor power
-        const n = 2; // repulsion factor power
-        d = d <= fd ? fd : d;
-
-        const resultAffinity = !affinityB
-            ? sign(affinityA) * affinityA ** 2
-            : affinityA * affinityB;
-        const coefficient =
-            Math.abs(resultAffinity) *
-            (-1 * sign(resultAffinity) * (ed / d) ** m - (ed / d) ** n);
-        // const coefficient = -resultAffinity / d;
-
-        return r.copy().multiply(coefficient);
-    }
-
     private applyForceField(probe: Particle, attractors: Attractor[]): void {
         attractors.forEach((attractor) => {
             const r = distance(probe.position, attractor.position);
@@ -307,7 +283,7 @@ class Universe {
                 ? undefined
                 : this.getAffinity(attractor.type, probe.type);
 
-            const force = this.getForce(r, d, affinityA, affinityB).multiply(
+            const force = getForce(r, d, affinityA, affinityB).multiply(
                 attractor.weight
             );
             probe.applyForce(force);
