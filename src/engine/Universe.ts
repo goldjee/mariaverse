@@ -212,10 +212,12 @@ class Universe {
                 ),
                 1e-6
             );
-            const timeDilation = Math.min(
-                this.config.desiredPrecision / (maxVelocity * delta),
-                this.config.slowMoFactor
-            );
+            let timeDilation = this.config.slowMoFactor;
+            if (this.config.desiredPrecision)
+                timeDilation = Math.min(
+                    this.config.desiredPrecision / (maxVelocity * delta),
+                    this.config.slowMoFactor
+                );
 
             // particle updates
             sectors.forEach((sector) => {
