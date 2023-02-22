@@ -10,7 +10,7 @@ import { useStore } from '../stores/stores';
 */
 
 const Mariaverse: React.FC = observer(() => {
-    const { universeStore: spaceStore } = useStore();
+    const { universeStore } = useStore();
     const parent = useRef(null);
     const [size, setSize] = useState({
         width: 0,
@@ -25,14 +25,14 @@ const Mariaverse: React.FC = observer(() => {
         if (parent.current) {
             const w = parent.current['offsetWidth'];
             // const h = parent.current['offsetHeight'];
-            const scaleFactor = w / spaceStore.getConfig().sizeX;
+            const scaleFactor = w / universeStore.getConfig().sizeX;
             setScale(scaleFactor);
             setSize({
-                width: spaceStore.getConfig().sizeX * scaleFactor,
-                height: spaceStore.getConfig().sizeY * scaleFactor,
+                width: universeStore.getConfig().sizeX * scaleFactor,
+                height: universeStore.getConfig().sizeY * scaleFactor,
             });
         }
-    }, [spaceStore.getConfig().sizeX, parent.current]);
+    }, [universeStore.getConfig().sizeX, parent.current]);
 
     const drawCircle = useCallback(
         (
@@ -83,18 +83,18 @@ const Mariaverse: React.FC = observer(() => {
             const timeNow = Date.now();
             const deltaTime = timeNow - lastRenderTimeRef.current;
 
-            void spaceStore.universe.update(deltaTime);
+            void universeStore.universe.update(deltaTime);
 
             // rendering
             clearBackground(context);
-            spaceStore.universe.getParticles().map((particle) => {
+            universeStore.universe.getParticles().map((particle) => {
                 drawParticle(context, particle);
             });
 
             lastRenderTimeRef.current = timeNow;
         }
         animationFrameRequestRef.current = requestAnimationFrame(renderFrame);
-    }, [clearBackground, drawParticle, spaceStore.universe]);
+    }, [clearBackground, drawParticle, universeStore.universe]);
 
     useEffect(() => {
         setCanvasDimensions();

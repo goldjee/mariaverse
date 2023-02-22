@@ -3,7 +3,7 @@ import { ParticleProperties } from '../engine/Particle';
 import Universe from '../engine/Universe';
 import { DEFAULT_CONFIG, Config } from '../engine/Config';
 
-class SpaceStore {
+class UniverseStore {
     public universe: Universe;
 
     constructor() {
@@ -47,4 +47,4 @@ class SpaceStore {
     }
 }
 
-export default SpaceStore;
+export default UniverseStore;
