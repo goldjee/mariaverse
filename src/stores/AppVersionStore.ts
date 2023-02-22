@@ -20,10 +20,16 @@ class AppVersionStore {
         this._appVersion = process.env.REACT_APP_VERSION || 'dev';
         const savedAppVersion = this.loadAppInfoParameter('app_version');
 
-        if (savedAppHash !== this.appHash || savedAppVersion !== this.appVersion) {
+        if (
+            savedAppHash !== this.appHash ||
+            savedAppVersion !== this.appVersion
+        ) {
             localStorage.clear();
             localStorage.setItem('app_hash', JSON.stringify(this.appHash));
-            localStorage.setItem('app_version', JSON.stringify(this.appVersion));
+            localStorage.setItem(
+                'app_version',
+                JSON.stringify(this.appVersion)
+            );
         }
 
         makeAutoObservable(this);

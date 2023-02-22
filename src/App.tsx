@@ -19,20 +19,23 @@ const App: React.FC = () => {
     return (
         <StoreContext.Provider value={stores}>
             <AppShell
-                padding="md"
+                padding='md'
                 header={
-                    <Header height={60} p="xs">
-                        <Group spacing="xs">
+                    <Header height={60} p='xs'>
+                        <Group spacing='xs'>
                             <Image src={logo} width={40} />
-                            <Group spacing="xs" align="baseline">
+                            <Group spacing='xs' align='baseline'>
                                 <Title>Mariaverse</Title>
-                                <Text>v.{stores.appVersionStore.appVersion} ({stores.appVersionStore.appHash})</Text>
+                                <Text>
+                                    v.{stores.appVersionStore.appVersion} (
+                                    {stores.appVersionStore.appHash})
+                                </Text>
                             </Group>
                         </Group>
                     </Header>
                 }
             >
-                <Grid h="100%">
+                <Grid h='100%'>
                     <Grid.Col lg={8} md={12}>
                         <Stack>
                             <Mariaverse />
