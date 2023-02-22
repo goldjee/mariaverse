@@ -1,8 +1,10 @@
 import React from 'react';
 
+import AppVersionStore from './AppVersionStore';
 import UniverseStore from './UniverseStore';
 
 export const stores = {
+    appVersionStore: new AppVersionStore(),
     universeStore: new UniverseStore(),
 };
 

@@ -5,6 +5,7 @@ import {
     Group,
     Header,
     Stack,
+    Text,
     Title,
     Image,
 } from '@mantine/core';
@@ -23,7 +24,10 @@ const App: React.FC = () => {
                     <Header height={60} p="xs">
                         <Group spacing="xs">
                             <Image src={logo} width={40} />
-                            <Title>Mariaverse</Title>
+                            <Group spacing="xs" align="baseline">
+                                <Title>Mariaverse</Title>
+                                <Text>v.{stores.appVersionStore.appVersion} ({stores.appVersionStore.appHash})</Text>
+                            </Group>
                         </Group>
                     </Header>
                 }
