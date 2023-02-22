@@ -35,7 +35,7 @@ class UniverseStore {
     }
 
     public getParticleProperties(): ParticleProperties[] {
-        return this.universe.getParticleProperties();
+        return this.universe.particleProperties;
     }
 
     public recreateParticleProperties(): void {

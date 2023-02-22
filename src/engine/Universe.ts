@@ -16,7 +16,7 @@ import getForce from './force';
 
 class Universe {
     private _config: Config;
-    public particleProperties: ParticleProperties[] = [];
+    private _particleProperties: ParticleProperties[] = [];
     private _space: Space;
     private timeSinceLastDrift: number;
     private isRunning = false;
@@ -47,12 +47,15 @@ class Universe {
             this.repopulate();
         }
     }
+    public get particleProperties(): ParticleProperties[] {
+        return this._particleProperties;
+    }
     public get space(): Space {
         return this._space;
     }
 
     public setParticleProperties(): void {
-        this.particleProperties = [];
+        this._particleProperties = [];
         particleTypes.forEach((type) => {
             const affinities: Affinity[] = [];
             particleTypes.forEach((typeB) => {
@@ -128,12 +131,8 @@ class Universe {
         return this.space.getParticles();
     }
 
-    public getParticleProperties(): ParticleProperties[] {
-        return this.particleProperties;
-    }
-
     public getAffinity(typeA: ParticleType, typeB: ParticleType): number {
-        const properties = this.getParticleProperties().find(
+        const properties = this.particleProperties.find(
             (property) => property.type === typeA
         );
         if (!properties) return 0;

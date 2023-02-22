@@ -60,7 +60,7 @@ export class Particle {
 
     public get mass(): number {
         const properties = this._universe
-            .getParticleProperties()
+            .particleProperties
             .find((property) => property.type === this._type);
         return properties?.mass || 0;
     }
