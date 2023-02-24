@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/mariaverse/static/js/main.fb1ef8c9.js",
+    "main.js": "/mariaverse/static/js/main.555253dc.js",
     "static/js/787.5635bcc3.chunk.js": "/mariaverse/static/js/787.5635bcc3.chunk.js",
     "static/media/logo.svg": "/mariaverse/static/media/logo.78c1f687e1f1eb2961a4e84d09b0cb02.svg",
     "index.html": "/mariaverse/index.html",
-    "main.fb1ef8c9.js.map": "/mariaverse/static/js/main.fb1ef8c9.js.map",
+    "main.555253dc.js.map": "/mariaverse/static/js/main.555253dc.js.map",
     "787.5635bcc3.chunk.js.map": "/mariaverse/static/js/787.5635bcc3.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.fb1ef8c9.js"
+    "static/js/main.555253dc.js"
   ]
 }
