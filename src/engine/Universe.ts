@@ -1,4 +1,4 @@
-import Attractor, { exclude } from './Attractor';
+import Attractor, { exclude, merge } from './Attractor';
 import {
     Particle,
     ParticleProperties,
@@ -156,7 +156,7 @@ class Universe {
 
             // particle interactions
             sectors.forEach((sector) => {
-                const neighborAttractors: Attractor[] = [];
+                let neighborAttractors: Attractor[] = [];
                 sector.neighbors.forEach((neighbor) => {
                     if (neighbor.isEmpty()) return;
 
@@ -172,28 +172,34 @@ class Universe {
                             neighborAttractors.push(attractor);
                     });
                 });
-
-                const localAttractors: Attractor[] = particleTypes
-                    .map((type) => sector.getAttractor(type))
-                    .filter(
-                        (attractor) => attractor !== undefined
-                    ) as Attractor[];
+                neighborAttractors = merge(neighborAttractors);
 
                 sector.getParticles().forEach((particle) => {
-                    const attractors: Attractor[] = localAttractors
-                        .map((attractor) =>
-                            exclude(particle.getAttractor(), attractor)
-                        )
-                        .filter(
-                            (attractor): attractor is Attractor =>
-                                attractor !== undefined &&
-                                attractor.weight !== 0
-                        );
+                    let attractors: Attractor[] = [];
 
-                    this.applyForceField(particle, [
-                        ...neighborAttractors,
-                        ...attractors,
-                    ]);
+                    if (sector.getParticles().length > 1) {
+                        const sectorAttractors: Attractor[] = particleTypes
+                            .map((type) => sector.getAttractor(type))
+                            .filter(
+                                (attractor) => attractor !== undefined
+                            ) as Attractor[];
+
+                        const localAttractors: Attractor[] = sectorAttractors
+                            .map((attractor) =>
+                                exclude(particle.getAttractor(), attractor)
+                            )
+                            .filter(
+                                (attractor): attractor is Attractor =>
+                                    attractor !== undefined &&
+                                    attractor.weight !== 0
+                            );
+
+                        attractors.push(...localAttractors);
+                    }
+                    attractors.push(...neighborAttractors);
+                    attractors = merge(attractors);
+
+                    this.applyForceField(particle, attractors);
                 });
             });
 
