@@ -28,7 +28,7 @@ const ConfigPanel: React.FC = () => {
         repopulate,
     } = universeStore;
 
-    const particlePropertiesViews: ReactNode[] = useMemo(() => {
+    const particlePropertiesViews: ReactNode[] = useMemo((): ReactNode[] => {
         const p: ReactNode[] = [];
         particleProperties.forEach((properties, type) => {
             p.push(
