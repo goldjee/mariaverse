@@ -156,27 +156,30 @@ class Universe {
             const sectors = this.space.getSectors(true);
 
             // particle interactions
-            sectors.forEach((sector) => {
-                let neighborAttractors: Attractor[] = [];
-                sector.neighbors.forEach((neighbor) => {
-                    if (neighbor.isEmpty()) return;
+            for (const sector of sectors) {
+                const neighborAttractors: Attractor[] = [];
+                for (const neighbor of sector.neighbors) {
+                    if (neighbor.isEmpty()) continue;
 
-                    particleTypes.forEach((type) => {
+                    for (const type of particleTypes) {
                         const attractor = neighbor.getAttractor(type);
+                        if (!attractor) continue;
+
+                        const distanceSquared = distance(
+                            attractor.position,
+                            sector.center
+                        ).modulusSquared();
                         if (
-                            attractor &&
-                            distance(
-                                attractor?.position,
-                                sector.center
-                            ).modulus() <= this.config.forceDistanceCap
+                            distanceSquared <=
+                            this.config.forceDistanceCap ** 2
                         )
                             neighborAttractors.push(attractor);
-                    });
-                });
-                neighborAttractors = merge(neighborAttractors);
+                    }
+                }
+                const mergedNeighborAttractors = merge(neighborAttractors);
 
-                sector.getParticles().forEach((particle) => {
-                    let attractors: Attractor[] = [];
+                for (const particle of sector.getParticles()) {
+                    const attractors: Attractor[] = [];
 
                     if (sector.getParticles().length > 1) {
                         const sectorAttractors: Attractor[] = particleTypes
@@ -197,61 +200,72 @@ class Universe {
 
                         attractors.push(...localAttractors);
                     }
-                    attractors.push(...neighborAttractors);
-                    attractors = merge(attractors);
+                    attractors.push(...mergedNeighborAttractors);
+                    const mergedAttractors = merge(attractors);
 
-                    this.applyForceField(particle, attractors);
-                });
-            });
+                    this.applyForceField(particle, mergedAttractors);
+                }
+            }
 
             // time step adaptation
-            const maxVelocity = Math.max(
-                ...sectors.flatMap((sector) =>
-                    sector
-                        .getParticles()
-                        .map((particle) => particle.velocity.modulus())
-                ),
-                1e-6
-            );
             let timeDilation = this.config.slowMoFactor;
-            if (this.config.desiredPrecision)
+            if (this.config.desiredPrecision) {
+                const maxVelocity = Math.max(
+                    ...sectors.flatMap((sector) =>
+                        sector
+                            .getParticles()
+                            .map((particle) => particle.velocity.modulus())
+                    ),
+                    1e-6
+                );
                 timeDilation = Math.min(
                     this.config.desiredPrecision / (maxVelocity * delta),
                     this.config.slowMoFactor
                 );
+            }
 
             // particle updates
-            sectors.forEach((sector) => {
-                sector.getParticles().forEach((particle) => {
+            for (const sector of sectors) {
+                for (const particle of sector.getParticles()) {
                     // repel from walls
                     const { top, right, bottom, left } =
                         this.space.getWallProximity(particle);
 
-                    const wallRepel = -1 * Math.abs(this.config.wallAffinity); // this is positive because of vector direction
-                    const wallRepelForces: Vector[] = [];
-                    if (Math.abs(left.x) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(
-                            getForce(left, left.modulus(), wallRepel)
-                        );
+                    if (
+                        Math.min(
+                            Math.abs(left.x),
+                            Math.abs(right.x),
+                            Math.abs(top.y),
+                            Math.abs(bottom.y)
+                        ) <= this.config.forceDistanceCap
+                    ) {
+                        const wallRepel =
+                            -1 * Math.abs(this.config.wallAffinity); // this is positive because of vector direction
+                        const wallRepelForces: Vector[] = [];
+                        if (Math.abs(left.x) <= this.config.forceDistanceCap)
+                            wallRepelForces.push(
+                                getForce(left, left.modulus(), wallRepel)
+                            );
 
-                    if (Math.abs(right.x) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(
-                            getForce(right, right.modulus(), wallRepel)
-                        );
+                        if (Math.abs(right.x) <= this.config.forceDistanceCap)
+                            wallRepelForces.push(
+                                getForce(right, right.modulus(), wallRepel)
+                            );
 
-                    if (Math.abs(top.y) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(
-                            getForce(top, top.modulus(), wallRepel)
-                        );
+                        if (Math.abs(top.y) <= this.config.forceDistanceCap)
+                            wallRepelForces.push(
+                                getForce(top, top.modulus(), wallRepel)
+                            );
 
-                    if (Math.abs(bottom.y) <= this.config.forceDistanceCap)
-                        wallRepelForces.push(
-                            getForce(bottom, bottom.modulus(), wallRepel)
-                        );
+                        if (Math.abs(bottom.y) <= this.config.forceDistanceCap)
+                            wallRepelForces.push(
+                                getForce(bottom, bottom.modulus(), wallRepel)
+                            );
 
-                    wallRepelForces.forEach((force) =>
-                        particle.applyForce(force)
-                    );
+                        wallRepelForces.forEach((force) =>
+                            particle.applyForce(force)
+                        );
+                    }
 
                     // particle.move(delta * this.config.slowMoFactor);
                     particle.move(delta * timeDilation);
@@ -264,22 +278,22 @@ class Universe {
                         sector.removeParticle(particle);
                         newSector.addParticle(particle);
                     }
-                });
+                }
 
                 particleTypes.forEach((type) => {
                     sector.updateAttractor(type);
                 });
-            });
+            }
 
             this.timeSinceLastDrift += delta;
         }
     }
 
     private applyForceField(probe: Particle, attractors: Attractor[]): void {
-        attractors.forEach((attractor) => {
+        for (const attractor of attractors) {
             const r = distance(probe.position, attractor.position);
             const d = r.modulus();
-            if (d > this.config.forceDistanceCap) return;
+            if (d > this.config.forceDistanceCap) continue;
 
             const affinityA = this.getAffinity(probe.type, attractor.type);
             const affinityB = this.config.hasAsymmetricInteractions
@@ -290,7 +304,7 @@ class Universe {
                 attractor.weight
             );
             probe.applyForce(force);
-        });
+        }
     }
 }
 

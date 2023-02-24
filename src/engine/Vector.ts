@@ -24,6 +24,14 @@ export class Vector {
     }
 
     /**
+     * Utility function to avoid calculation of square root
+     * @returns Squared modulus of this vector
+     */
+    public modulusSquared(): number {
+        return this.x * this.x + this.y * this.y;
+    }
+
+    /**
      * Adds a vector to this vector
      * @param vector Vector to add
      * @returns Mutated vector
