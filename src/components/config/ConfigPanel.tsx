@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
     NumberInput,
@@ -14,74 +14,66 @@ import {
 } from '@mantine/core';
 import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
 import { GiWeight } from 'react-icons/gi';
-import { DEFAULT_CONFIG, Config } from '../../engine/Config';
+import { Config } from '../../engine/Config';
 import ConfigEntry from './ConfigEntry';
 import { useStore } from '../../stores/stores';
 import Circle from '../Circle';
 
 const ConfigPanel: React.FC = observer(() => {
     const { universeStore } = useStore();
-    const [config, setConfig] = useState<Config>(
-        universeStore.getConfig() || DEFAULT_CONFIG
-    );
-    const [particleProperties, setParticleProperties] = useState(
-        universeStore.universe.particleProperties
-    );
+    const {
+        config,
+        setConfig,
+        particleProperties,
+        setParticleProperties,
+        repopulate,
+    } = universeStore;
 
     const onChange = useCallback(
         (value: number | boolean | undefined, key: string) => {
             if (key in config) {
-                setConfig((prev) => {
-                    const newConfig = {
-                        ...prev,
-                        ...{ [key]: value },
-                    } as Config;
-                    universeStore.setConfig(newConfig);
-                    return newConfig;
-                });
+                setConfig({
+                    ...config,
+                    ...{ [key]: value },
+                } as Config);
             }
         },
-        [config, universeStore]
+        [config, setConfig]
     );
 
     const reset = useCallback(() => {
         universeStore.setConfig();
-        setConfig(universeStore.getConfig());
-        universeStore.recreateParticleProperties();
+        setConfig();
+        setParticleProperties();
         universeStore.repopulate();
-    }, [universeStore]);
+    }, [setConfig, setParticleProperties, universeStore]);
 
-    const recreateParticleProperties = useCallback(() => {
-        universeStore.recreateParticleProperties();
-        setParticleProperties(universeStore.getParticleProperties());
-    }, [universeStore]);
+    const resetParticleProperties = useCallback(() => {
+        setParticleProperties();
+    }, [setParticleProperties]);
 
-    const repopulate = useCallback(() => {
-        universeStore.recreateParticleProperties();
-        universeStore.repopulate();
-    }, [universeStore]);
-
-    useEffect(() => {
-        universeStore.universe.config = config;
-    }, [config, universeStore]);
+    const resetParticles = useCallback(() => {
+        setParticleProperties();
+        repopulate();
+    }, [repopulate, setParticleProperties]);
 
     return (
-        <Stack align="flex-start" justify="flex-start">
-            <Card w="100%">
+        <Stack align='flex-start' justify='flex-start'>
+            <Card w='100%'>
                 <Stack>
-                    <Group position="apart">
+                    <Group position='apart'>
                         <Title order={5}>Свойства вселенной</Title>
-                        <Tooltip label="Сбросить настройки">
+                        <Tooltip label='Сбросить настройки'>
                             <ActionIcon
                                 onClick={reset}
-                                color="red"
-                                variant="outline"
+                                color='red'
+                                variant='outline'
                             >
                                 <BsArrowClockwise />
                             </ActionIcon>
                         </Tooltip>
                     </Group>
-                    <ConfigEntry label="Скорость света">
+                    <ConfigEntry label='Скорость света'>
                         <NumberInput
                             min={0}
                             value={config.velocityCap}
@@ -89,7 +81,7 @@ const ConfigPanel: React.FC = observer(() => {
                             onChange={(value) => onChange(value, 'velocityCap')}
                         />
                     </ConfigEntry>
-                    <ConfigEntry label="Предел дальнодействия">
+                    <ConfigEntry label='Предел дальнодействия'>
                         <NumberInput
                             min={400}
                             value={config.forceDistanceCap}
@@ -99,7 +91,7 @@ const ConfigPanel: React.FC = observer(() => {
                             }
                         />
                     </ConfigEntry>
-                    <ConfigEntry label="Асимметричные взаимодействия">
+                    <ConfigEntry label='Асимметричные взаимодействия'>
                         <Switch
                             checked={config.hasAsymmetricInteractions}
                             onChange={(e) =>
@@ -110,7 +102,7 @@ const ConfigPanel: React.FC = observer(() => {
                             }
                         />
                     </ConfigEntry>
-                    <ConfigEntry label="Вязкость среды">
+                    <ConfigEntry label='Вязкость среды'>
                         <Slider
                             step={1e-1}
                             min={1e-9}
@@ -119,8 +111,8 @@ const ConfigPanel: React.FC = observer(() => {
                                 config.viscosity === 1e-9
                                     ? config.viscosity
                                     : Number.parseFloat(
-                                        config.viscosity.toFixed(1)
-                                    )
+                                          config.viscosity.toFixed(1)
+                                      )
                             }
                             onChange={(value) => onChange(value, 'viscosity')}
                         />
@@ -128,24 +120,24 @@ const ConfigPanel: React.FC = observer(() => {
                 </Stack>
             </Card>
 
-            <Card w="100%">
+            <Card w='100%'>
                 <Stack>
-                    <Group position="apart">
+                    <Group position='apart'>
                         <Title order={5}>Частицы</Title>
-                        <Tooltip label="Пересоздать">
+                        <Tooltip label='Пересоздать'>
                             <ActionIcon
-                                onClick={repopulate}
-                                color="blue"
-                                variant="filled"
+                                onClick={resetParticles}
+                                color='blue'
+                                variant='filled'
                             >
                                 <BsWind />
                             </ActionIcon>
                         </Tooltip>
                     </Group>
-                    <ConfigEntry label="Количество частиц">
-                        <Group position="left" grow>
+                    <ConfigEntry label='Количество частиц'>
+                        <Group position='left' grow>
                             <NumberInput
-                                label="мин"
+                                label='мин'
                                 min={0}
                                 max={config.particleCountMax}
                                 value={config.particleCountMin}
@@ -153,10 +145,10 @@ const ConfigPanel: React.FC = observer(() => {
                                 onChange={(value) =>
                                     onChange(value, 'particleCountMin')
                                 }
-                                w="50%"
+                                w='50%'
                             />
                             <NumberInput
-                                label="макс"
+                                label='макс'
                                 min={config.particleCountMin}
                                 max={2000}
                                 value={config.particleCountMax}
@@ -164,38 +156,38 @@ const ConfigPanel: React.FC = observer(() => {
                                 onChange={(value) =>
                                     onChange(value, 'particleCountMax')
                                 }
-                                w="50%"
+                                w='50%'
                             />
                         </Group>
                     </ConfigEntry>
-                    <ConfigEntry label="Масса частицы">
-                        <Group position="left" grow>
+                    <ConfigEntry label='Масса частицы'>
+                        <Group position='left' grow>
                             <NumberInput
-                                label="мин"
+                                label='мин'
                                 min={0}
                                 max={config.massMax}
                                 value={config.massMin}
                                 step={0.1}
                                 precision={1}
                                 onChange={(value) => onChange(value, 'massMin')}
-                                w="50%"
+                                w='50%'
                             />
                             <NumberInput
-                                label="макс"
+                                label='макс'
                                 min={config.massMin}
                                 max={2}
                                 value={config.massMax}
                                 step={0.1}
                                 precision={1}
                                 onChange={(value) => onChange(value, 'massMax')}
-                                w="50%"
+                                w='50%'
                             />
                         </Group>
                     </ConfigEntry>
-                    <ConfigEntry label="Тяга к соседям">
-                        <Group position="left" grow>
+                    <ConfigEntry label='Тяга к соседям'>
+                        <Group position='left' grow>
                             <NumberInput
-                                label="мин"
+                                label='мин'
                                 min={-100}
                                 max={config.affinityMax}
                                 value={config.affinityMin}
@@ -204,10 +196,10 @@ const ConfigPanel: React.FC = observer(() => {
                                 onChange={(value) =>
                                     onChange(value, 'affinityMin')
                                 }
-                                w="50%"
+                                w='50%'
                             />
                             <NumberInput
-                                label="макс"
+                                label='макс'
                                 min={config.affinityMin}
                                 max={100}
                                 value={config.affinityMax}
@@ -216,33 +208,33 @@ const ConfigPanel: React.FC = observer(() => {
                                 onChange={(value) =>
                                     onChange(value, 'affinityMax')
                                 }
-                                w="50%"
+                                w='50%'
                             />
                         </Group>
                     </ConfigEntry>
                 </Stack>
             </Card>
 
-            <Card w="100%">
+            <Card w='100%'>
                 <Stack>
-                    <Group position="apart">
+                    <Group position='apart'>
                         <Title order={5}>Свойства частиц</Title>
-                        <Tooltip label="Сгенерировать новые">
+                        <Tooltip label='Сгенерировать новые'>
                             <ActionIcon
-                                onClick={recreateParticleProperties}
-                                color="blue"
-                                variant="filled"
+                                onClick={resetParticleProperties}
+                                color='blue'
+                                variant='filled'
                             >
                                 <BsArrowLeftRight />
                             </ActionIcon>
                         </Tooltip>
                     </Group>
                     {particleProperties.map((properties) => (
-                        <Stack key={properties.type} spacing="xs">
+                        <Stack key={properties.type} spacing='xs'>
                             <ConfigEntry
                                 label={
                                     <Title order={6} color={properties.type}>
-                                        <Group spacing="sm">
+                                        <Group spacing='sm'>
                                             <GiWeight />
                                             {properties.type}
                                         </Group>
@@ -254,7 +246,7 @@ const ConfigPanel: React.FC = observer(() => {
                             {properties.affinities.map((affinity) => (
                                 <ConfigEntry
                                     label={
-                                        <Group spacing="sm">
+                                        <Group spacing='sm'>
                                             <Circle color={properties.type} />
                                             <Text>→</Text>
                                             <Circle color={affinity.type} />

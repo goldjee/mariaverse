@@ -3,13 +3,18 @@
         "node": true,
         "es2021": true
     },
-    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:react-hooks/recommended"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react-hooks/recommended",
+        "prettier"
+    ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["@typescript-eslint"],
+    "plugins": ["@typescript-eslint", "prettier", "mobx"],
     "overrides": [
         {
             "files": ["*.ts", "*.tsx"],
@@ -20,10 +25,13 @@
         }
     ],
     "rules": {
-        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "prettier/prettier": "warn",
+        // "indent": ["error", 4, { "SwitchCase": 1 }],
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "single"],
         "semi": ["error", "always"],
-        "@typescript-eslint/no-floating-promises": 1
+        "@typescript-eslint/no-floating-promises": 1,
+        "mobx/exhaustive-make-observable": "warn",
+        "mobx/unconditional-make-observable": "error"
     }
 }

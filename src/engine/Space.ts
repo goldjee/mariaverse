@@ -60,9 +60,7 @@ class Space {
             Math.ceil(universe.config.forceDistanceCap / this.sectorWidth);
         const offsetY =
             this.sectorHeight *
-            Math.ceil(
-                universe.config.forceDistanceCap / this.sectorHeight
-            );
+            Math.ceil(universe.config.forceDistanceCap / this.sectorHeight);
         this.sectors.forEach((sector) => {
             for (
                 let x = sector.center.x - offsetX;

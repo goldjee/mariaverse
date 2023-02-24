@@ -8,8 +8,8 @@ const About: React.FC = () => {
                 <Text>
                     Как-то летом я серфил Youtube и наткнулся на очень занятное{' '}
                     <Anchor
-                        href="https://www.youtube.com/watch?v=0Kx4Y9TVMGg"
-                        target="_blank"
+                        href='https://www.youtube.com/watch?v=0Kx4Y9TVMGg'
+                        target='_blank'
                     >
                         видео
                     </Anchor>
@@ -19,8 +19,8 @@ const About: React.FC = () => {
                 <Highlight
                     highlight={['Mariaverse']}
                     highlightStyles={{ background: 'none' }}
-                    weight="bolder"
-                    variant="gradient"
+                    weight='bolder'
+                    variant='gradient'
                 >
                     Mariaverse - это удивительный в своей простоте симулятор
                     маленькой вселенной.

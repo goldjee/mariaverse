@@ -12,7 +12,7 @@ export function rnd(a?: number, b?: number): number {
 
 /**
  * Analog to Math.sign(), but expected to be a bit faster.
- * @param x 
+ * @param x
  * @returns Sign of x
  */
 export function sign(x: number) {

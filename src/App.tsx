@@ -5,49 +5,44 @@ import {
     Group,
     Header,
     Stack,
-    Text,
     Title,
     Image,
 } from '@mantine/core';
+
 import Mariaverse from './components/Mariaverse';
 import ConfigPanel from './components/config/ConfigPanel';
-import { StoreContext, stores } from './stores/stores';
 import About from './components/About';
 import logo from './logo.svg';
+import AppVersion from './components/AppVersion';
 
 const App: React.FC = () => {
     return (
-        <StoreContext.Provider value={stores}>
-            <AppShell
-                padding='md'
-                header={
-                    <Header height={60} p='xs'>
-                        <Group spacing='xs'>
-                            <Image src={logo} width={40} />
-                            <Group spacing='xs' align='baseline'>
-                                <Title>Mariaverse</Title>
-                                <Text>
-                                    v.{stores.appVersionStore.appVersion} (
-                                    {stores.appVersionStore.appHash})
-                                </Text>
-                            </Group>
+        <AppShell
+            padding='md'
+            header={
+                <Header height={60} p='xs'>
+                    <Group spacing='xs'>
+                        <Image src={logo} width={40} />
+                        <Group spacing='xs' align='baseline'>
+                            <Title>Mariaverse</Title>
+                            <AppVersion />
                         </Group>
-                    </Header>
-                }
-            >
-                <Grid h='100%'>
-                    <Grid.Col lg={8} md={12}>
-                        <Stack>
-                            <Mariaverse />
-                            <About />
-                        </Stack>
-                    </Grid.Col>
-                    <Grid.Col lg={4} md={12}>
-                        <ConfigPanel />
-                    </Grid.Col>
-                </Grid>
-            </AppShell>
-        </StoreContext.Provider>
+                    </Group>
+                </Header>
+            }
+        >
+            <Grid h='100%'>
+                <Grid.Col lg={8} md={12}>
+                    <Stack>
+                        <Mariaverse />
+                        <About />
+                    </Stack>
+                </Grid.Col>
+                <Grid.Col lg={4} md={12}>
+                    <ConfigPanel />
+                </Grid.Col>
+            </Grid>
+        </AppShell>
     );
 };
 

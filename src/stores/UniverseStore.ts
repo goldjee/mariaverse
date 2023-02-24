@@ -8,9 +8,9 @@ class UniverseStore {
 
     constructor() {
         const config = this.loadConfig();
-        this.universe = new Universe(config);
+        this.universe = makeAutoObservable(new Universe(config));
         this.saveConfig(config);
-        makeAutoObservable(this);
+        makeAutoObservable(this, {}, { autoBind: true });
     }
 
     private loadConfig(): Config {
@@ -30,15 +30,15 @@ class UniverseStore {
         this.saveConfig(config);
     }
 
-    public getConfig(): Config {
+    public get config(): Config {
         return this.universe.config;
     }
 
-    public getParticleProperties(): ParticleProperties[] {
+    public get particleProperties(): ParticleProperties[] {
         return this.universe.particleProperties;
     }
 
-    public recreateParticleProperties(): void {
+    public setParticleProperties(): void {
         this.universe.setParticleProperties();
     }
 

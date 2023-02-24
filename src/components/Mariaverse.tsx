@@ -25,14 +25,14 @@ const Mariaverse: React.FC = observer(() => {
         if (parent.current) {
             const w = parent.current['offsetWidth'];
             // const h = parent.current['offsetHeight'];
-            const scaleFactor = w / universeStore.getConfig().sizeX;
+            const scaleFactor = w / universeStore.config.sizeX;
             setScale(scaleFactor);
             setSize({
-                width: universeStore.getConfig().sizeX * scaleFactor,
-                height: universeStore.getConfig().sizeY * scaleFactor,
+                width: universeStore.config.sizeX * scaleFactor,
+                height: universeStore.config.sizeY * scaleFactor,
             });
         }
-    }, [universeStore.getConfig().sizeX, parent.current]);
+    }, [universeStore.config.sizeX, parent.current]);
 
     const drawCircle = useCallback(
         (
