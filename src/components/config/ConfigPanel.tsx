@@ -33,6 +33,7 @@ const ConfigPanel: React.FC = () => {
         particleProperties.forEach((properties, type) => {
             p.push(
                 <ParticlePropertiesView
+                    key={type}
                     type={type}
                     mass={properties.mass}
                     affinities={properties.affinities}
