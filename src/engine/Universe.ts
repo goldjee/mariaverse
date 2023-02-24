@@ -1,6 +1,5 @@
 import Attractor, { exclude } from './Attractor';
 import {
-    Affinity,
     Particle,
     ParticleProperties,
     ParticleType,
@@ -16,7 +15,7 @@ import getForce from './force';
 
 class Universe {
     private _config: Config;
-    private _particleProperties: ParticleProperties[] = [];
+    private _particlesProperties: Map<ParticleType, ParticleProperties>;
     private _space: Space;
     private timeSinceLastDrift: number;
     private isRunning = false;
@@ -25,7 +24,8 @@ class Universe {
         this._config = config || DEFAULT_CONFIG;
         this._space = new Space(this);
 
-        this.setParticleProperties();
+        this._particlesProperties = new Map();
+        this.setParticlesProperties();
         this.repopulate();
 
         this.timeSinceLastDrift = 0;
@@ -43,51 +43,50 @@ class Universe {
         this._config = config;
 
         if (isDimensionsChanged) {
-            this.setParticleProperties();
+            this.setParticlesProperties();
             this.repopulate();
         }
     }
-    public get particleProperties(): ParticleProperties[] {
-        return this._particleProperties;
+    public get particlesProperties(): Map<ParticleType, ParticleProperties> {
+        return this._particlesProperties;
     }
     public get space(): Space {
         return this._space;
     }
 
-    public setParticleProperties(): void {
-        this._particleProperties = [];
+    public setParticlesProperties(): void {
+        this._particlesProperties = new Map();
         particleTypes.forEach((type) => {
-            const affinities: Affinity[] = [];
+            const properties: ParticleProperties = {
+                mass: rnd(this.config.massMin, this.config.massMax),
+                affinities: new Map<ParticleType, number>(),
+            };
+
             particleTypes.forEach((typeB) => {
-                affinities.push({
-                    type: typeB,
-                    affinity: !this.config.isDebug
+                properties.affinities.set(
+                    typeB,
+                    !this.config.isDebug
                         ? rnd(this.config.affinityMin, this.config.affinityMax)
-                        : 1,
-                });
+                        : 1
+                );
             });
 
-            this.particleProperties.push({
-                type,
-                mass: rnd(this.config.massMin, this.config.massMax),
-                affinities,
-            });
+            this.particlesProperties.set(type, properties);
         });
     }
 
     private driftParticleProperties(): void {
-        for (const property of this.particleProperties) {
-            const newAffinities: Affinity[] = property.affinities.map(
-                (affinity) => ({
-                    type: affinity.type,
-                    affinity:
-                        -1 *
-                        sign(affinity.affinity) *
-                        rnd(this.config.affinityMin, this.config.affinityMax),
-                })
-            );
-            property.affinities = newAffinities;
-        }
+        this.particlesProperties.forEach((properties) => {
+            properties.mass = rnd(this.config.massMin, this.config.massMax);
+            properties.affinities.forEach((affinity, type) => {
+                properties.affinities.set(
+                    type,
+                    -1 *
+                        sign(affinity) *
+                        rnd(this.config.affinityMin, this.config.affinityMax)
+                );
+            });
+        });
     }
 
     private addParticlePool(type: ParticleType) {
@@ -132,15 +131,11 @@ class Universe {
     }
 
     public getAffinity(typeA: ParticleType, typeB: ParticleType): number {
-        const properties = this.particleProperties.find(
-            (property) => property.type === typeA
-        );
-        if (!properties) return 0;
+        const particleProperties = this.particlesProperties.get(typeA);
+        if (!particleProperties) return 0;
 
-        const entry = properties.affinities.find(
-            (entry) => entry.type === typeB
-        );
-        return entry?.affinity || 0;
+        const affinity = particleProperties.affinities.get(typeB);
+        return affinity || 0;
     }
 
     public update(delta: number): void {

@@ -14,15 +14,9 @@ export const particleTypes = [
 ];
 export type ParticleType = (typeof particleTypes)[number];
 
-export interface Affinity {
-    type: ParticleType;
-    affinity: number;
-}
-
 export interface ParticleProperties {
-    type: ParticleType;
     mass: number;
-    affinities: Affinity[];
+    affinities: Map<ParticleType, number>;
 }
 
 export class Particle {
@@ -59,9 +53,7 @@ export class Particle {
     }
 
     public get mass(): number {
-        const properties = this._universe.particleProperties.find(
-            (property) => property.type === this._type
-        );
+        const properties = this._universe.particlesProperties.get(this.type);
         return properties?.mass || 0;
     }
 

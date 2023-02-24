@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { ParticleProperties } from '../engine/Particle';
+import { ParticleProperties, ParticleType } from '../engine/Particle';
 import Universe from '../engine/Universe';
 import { DEFAULT_CONFIG, Config } from '../engine/Config';
 
@@ -34,12 +34,12 @@ class UniverseStore {
         return this.universe.config;
     }
 
-    public get particleProperties(): ParticleProperties[] {
-        return this.universe.particleProperties;
+    public get particleProperties(): Map<ParticleType, ParticleProperties> {
+        return this.universe.particlesProperties;
     }
 
     public setParticleProperties(): void {
-        this.universe.setParticleProperties();
+        this.universe.setParticlesProperties();
     }
 
     public repopulate(): void {

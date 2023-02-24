@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
     NumberInput,
@@ -6,20 +6,19 @@ import {
     Stack,
     Switch,
     Title,
-    Text,
     Card,
     Group,
     ActionIcon,
     Tooltip,
 } from '@mantine/core';
 import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
-import { GiWeight } from 'react-icons/gi';
+
 import { Config } from '../../engine/Config';
 import ConfigEntry from './ConfigEntry';
 import { useStore } from '../../stores/stores';
-import Circle from '../Circle';
+import ParticlePropertiesView from './particle/ParticlePropertiesView';
 
-const ConfigPanel: React.FC = observer(() => {
+const ConfigPanel: React.FC = () => {
     const { universeStore } = useStore();
     const {
         config,
@@ -28,6 +27,20 @@ const ConfigPanel: React.FC = observer(() => {
         setParticleProperties,
         repopulate,
     } = universeStore;
+
+    const particlePropertiesViews: ReactNode[] = useMemo(() => {
+        const p: ReactNode[] = [];
+        particleProperties.forEach((properties, type) => {
+            p.push(
+                <ParticlePropertiesView
+                    type={type}
+                    mass={properties.mass}
+                    affinities={properties.affinities}
+                />
+            );
+        });
+        return p;
+    }, [particleProperties]);
 
     const onChange = useCallback(
         (value: number | boolean | undefined, key: string) => {
@@ -229,40 +242,11 @@ const ConfigPanel: React.FC = observer(() => {
                             </ActionIcon>
                         </Tooltip>
                     </Group>
-                    {particleProperties.map((properties) => (
-                        <Stack key={properties.type} spacing='xs'>
-                            <ConfigEntry
-                                label={
-                                    <Title order={6} color={properties.type}>
-                                        <Group spacing='sm'>
-                                            <GiWeight />
-                                            {properties.type}
-                                        </Group>
-                                    </Title>
-                                }
-                            >
-                                <Text>{properties.mass.toFixed(6)}</Text>
-                            </ConfigEntry>
-                            {properties.affinities.map((affinity) => (
-                                <ConfigEntry
-                                    label={
-                                        <Group spacing='sm'>
-                                            <Circle color={properties.type} />
-                                            <Text>→</Text>
-                                            <Circle color={affinity.type} />
-                                        </Group>
-                                    }
-                                    key={`${properties.type} -> ${affinity.type}`}
-                                >
-                                    <Text>{affinity.affinity.toFixed(6)}</Text>
-                                </ConfigEntry>
-                            ))}
-                        </Stack>
-                    ))}
+                    {particlePropertiesViews}
                 </Stack>
             </Card>
         </Stack>
     );
-});
+};
 
-export default ConfigPanel;
+export default observer(ConfigPanel);
