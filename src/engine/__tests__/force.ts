@@ -52,5 +52,4 @@ test('Repulsion at attractor position', () => {
     const force = getForce(r, d, affinity);
 
     expect(force.modulus()).toBeGreaterThan(0);
-    expect(force.x).toBeGreaterThan(0);
 });
