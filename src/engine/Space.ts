@@ -142,9 +142,9 @@ class Space {
      */
     public getParticles(): Particle[] {
         const result: Particle[] = [];
-        this.sectors.forEach((sector) => {
+        for (const sector of this.sectors.values()) {
             result.push(...sector.getParticles());
-        });
+        }
         return result;
     }
 

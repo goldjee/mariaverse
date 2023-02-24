@@ -20,14 +20,15 @@ import { useStore } from '../../stores/stores';
 import ParticlePropertiesView from './particle/ParticlePropertiesView';
 
 const ConfigPanel: React.FC = () => {
-    const { universeStore } = useStore();
     const {
-        config,
-        setConfig,
-        particleProperties,
-        setParticleProperties,
-        repopulate,
-    } = universeStore;
+        universeStore: {
+            config,
+            setConfig,
+            particleProperties,
+            setParticleProperties,
+            repopulate,
+        },
+    } = useStore();
 
     const particlePropertiesViews: ReactNode[] = useMemo(
         () =>
@@ -61,11 +62,11 @@ const ConfigPanel: React.FC = () => {
     );
 
     const reset = useCallback(() => {
-        universeStore.setConfig();
+        setConfig();
         setConfig();
         setParticleProperties();
-        universeStore.repopulate();
-    }, [setConfig, setParticleProperties, universeStore]);
+        repopulate();
+    }, [repopulate, setConfig, setParticleProperties]);
 
     const resetParticleProperties = useCallback(() => {
         setParticleProperties();
