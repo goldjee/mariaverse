@@ -9,7 +9,7 @@ import { useStore } from '../stores/stores';
     who made it all possible.
 */
 
-const Mariaverse: React.FC = observer(() => {
+const Mariaverse: React.FC = () => {
     const { universeStore } = useStore();
     const parent = useRef(null);
     const [size, setSize] = useState({
@@ -32,7 +32,7 @@ const Mariaverse: React.FC = observer(() => {
                 height: universeStore.config.sizeY * scaleFactor,
             });
         }
-    }, [universeStore.config.sizeX, parent.current]);
+    }, [universeStore.config.sizeX, universeStore.config.sizeY]);
 
     const drawCircle = useCallback(
         (
@@ -87,9 +87,9 @@ const Mariaverse: React.FC = observer(() => {
 
             // rendering
             clearBackground(context);
-            universeStore.universe.getParticles().map((particle) => {
+            for (const particle of universeStore.universe.getParticles()) {
                 drawParticle(context, particle);
-            });
+            }
 
             lastRenderTimeRef.current = timeNow;
         }
@@ -115,10 +115,10 @@ const Mariaverse: React.FC = observer(() => {
         <div ref={parent} style={{ width: '100%', maxWidth: '100vw' }}>
             <canvas ref={canvasRef} width={size.width} height={size.height}>
                 Прости, но похоже, в твоем браузере не поддерживаются нужные
-                технологии. Попробуй Chrome или Firefox/
+                технологии. Попробуй Chrome или Firefox.
             </canvas>
         </div>
     );
-});
+};
 
-export default Mariaverse;
+export default observer(Mariaverse);
