@@ -1,4 +1,5 @@
 import React, { ReactNode, useCallback, useMemo } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import {
     NumberInput,
@@ -28,20 +29,24 @@ const ConfigPanel: React.FC = () => {
         repopulate,
     } = universeStore;
 
-    const particlePropertiesViews: ReactNode[] = useMemo((): ReactNode[] => {
-        const p: ReactNode[] = [];
-        particleProperties.forEach((properties, type) => {
-            p.push(
-                <ParticlePropertiesView
-                    key={type}
-                    type={type}
-                    mass={properties.mass}
-                    affinities={properties.affinities}
-                />
-            );
-        });
-        return p;
-    }, [particleProperties]);
+    const particlePropertiesViews: ReactNode[] = useMemo(
+        () =>
+            computed((): ReactNode[] => {
+                const p: ReactNode[] = [];
+                particleProperties.forEach((properties, type) => {
+                    p.push(
+                        <ParticlePropertiesView
+                            key={type}
+                            type={type}
+                            mass={properties.mass}
+                            affinities={properties.affinities}
+                        />
+                    );
+                });
+                return p;
+            }),
+        [particleProperties]
+    ).get();
 
     const onChange = useCallback(
         (value: number | boolean | undefined, key: string) => {

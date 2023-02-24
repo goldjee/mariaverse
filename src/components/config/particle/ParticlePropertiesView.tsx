@@ -1,4 +1,5 @@
 import React, { ReactNode, useMemo } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Group, Stack, Text, Title } from '@mantine/core';
 import { GiWeight } from 'react-icons/gi';
@@ -16,20 +17,24 @@ const ParticlePropertiesView: React.FC<Props> = ({
     mass,
     affinities,
 }) => {
-    const affinityViews: ReactNode[] = useMemo((): ReactNode[] => {
-        const av: ReactNode[] = [];
-        affinities.forEach((affinity, counterpart) => {
-            av.push(
-                <AffinityView
-                    key={`${type} -> ${counterpart}`}
-                    typeA={type}
-                    typeB={counterpart}
-                    affinity={affinity}
-                />
-            );
-        });
-        return av;
-    }, [affinities, type]);
+    const affinityViews: ReactNode[] = useMemo(
+        () =>
+            computed((): ReactNode[] => {
+                const av: ReactNode[] = [];
+                affinities.forEach((affinity, counterpart) => {
+                    av.push(
+                        <AffinityView
+                            key={`${type} -> ${counterpart}`}
+                            typeA={type}
+                            typeB={counterpart}
+                            affinity={affinity}
+                        />
+                    );
+                });
+                return av;
+            }),
+        [affinities, type]
+    ).get();
 
     return (
         <Stack spacing='xs'>

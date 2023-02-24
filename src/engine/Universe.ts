@@ -150,6 +150,7 @@ class Universe {
                 if (this.timeSinceLastDrift >= this.config.driftPeriod) {
                     this.driftParticleProperties();
                     this.timeSinceLastDrift = 0;
+                    // console.log('drift');
                 }
 
             const sectors = this.space.getSectors(true);
