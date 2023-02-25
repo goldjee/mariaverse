@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 import { Box, BoxProps } from '@mantine/core';
 
 interface Props extends BoxProps {
@@ -19,4 +20,4 @@ const Circle: React.FC<Props> = ({ color, ...rest }) => {
     );
 };
 
-export default Circle;
+export default observer(Circle);

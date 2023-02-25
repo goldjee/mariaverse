@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 import {
     AppShell,
     Grid,
@@ -46,4 +47,4 @@ const App: React.FC = () => {
     );
 };
 
-export default App;
+export default observer(App);

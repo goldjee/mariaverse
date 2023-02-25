@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 import { Anchor, Card, Highlight, Stack, Text } from '@mantine/core';
 
 const About: React.FC = () => {
@@ -42,4 +43,4 @@ const About: React.FC = () => {
     );
 };
 
-export default About;
+export default observer(About);

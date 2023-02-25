@@ -4,13 +4,10 @@ import { Text } from '@mantine/core';
 
 import { useStore } from '../stores/stores';
 
-const AppVersion: React.FC = observer(() => {
+const AppVersion: React.FC = () => {
     const { appVersionStore } = useStore();
-    return (
-        <Text>
-            v.{appVersionStore.appVersion} ({appVersionStore.appHash})
-        </Text>
-    );
-});
 
-export default AppVersion;
+    return <Text>v.{appVersionStore.appVersion}</Text>;
+};
+
+export default observer(AppVersion);

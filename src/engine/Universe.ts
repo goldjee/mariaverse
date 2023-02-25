@@ -161,19 +161,16 @@ class Universe {
                 for (const neighbor of sector.neighbors) {
                     if (neighbor.isEmpty()) continue;
 
-                    for (const type of particleTypes) {
-                        const attractor = neighbor.getAttractor(type);
-                        if (!attractor) continue;
-
-                        const distanceSquared = distance(
-                            attractor.position,
-                            sector.center
-                        ).modulusSquared();
-                        if (
-                            distanceSquared <=
-                            this.config.forceDistanceCap ** 2
-                        )
-                            neighborAttractors.push(attractor);
+                    for (const attractor of neighbor.getAttractors()) {
+                        // const distanceSquared = distance(
+                        //     attractor.position,
+                        //     sector.center
+                        // ).modulusSquared();
+                        // if (
+                        //     distanceSquared <=
+                        //     this.config.forceDistanceCap ** 2
+                        // )
+                        neighborAttractors.push(attractor);
                     }
                 }
                 const mergedNeighborAttractors = merge(neighborAttractors);
@@ -182,11 +179,8 @@ class Universe {
                     const attractors: Attractor[] = [];
 
                     if (sector.getParticles().length > 1) {
-                        const sectorAttractors: Attractor[] = particleTypes
-                            .map((type) => sector.getAttractor(type))
-                            .filter(
-                                (attractor) => attractor !== undefined
-                            ) as Attractor[];
+                        const sectorAttractors: Attractor[] =
+                            sector.getAttractors();
 
                         const localAttractors: Attractor[] = sectorAttractors
                             .map((attractor) =>

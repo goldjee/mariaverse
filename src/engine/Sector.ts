@@ -30,6 +30,10 @@ class Sector {
         return this.attractors.get(type);
     }
 
+    public getAttractors(): Attractor[] {
+        return [...this.attractors.values()];
+    }
+
     public updateAttractor(type: ParticleType): void {
         const particles = this.particles.get(type);
 

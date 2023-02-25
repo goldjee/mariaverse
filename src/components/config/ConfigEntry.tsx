@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { observer } from 'mobx-react-lite';
 import { Box, Grid, Text } from '@mantine/core';
 
 interface Props {
@@ -23,4 +24,4 @@ const ConfigEntry: React.FC<Props> = ({ label, children }) => {
     );
 };
 
-export default ConfigEntry;
+export default observer(ConfigEntry);
