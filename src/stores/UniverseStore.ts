@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { ParticleProperties, ParticleType } from '../engine/Particle';
+import { Particle, ParticleProperties, ParticleType } from '../engine/Particle';
 import Universe from '../engine/Universe';
 import { DEFAULT_CONFIG, Config } from '../engine/Config';
 
@@ -44,6 +44,14 @@ class UniverseStore {
 
     public repopulate(): void {
         this.universe.repopulate();
+    }
+
+    public get particles(): Particle[] {
+        return this.universe.getParticles();
+    }
+
+    public update(delta: number): void {
+        this.universe.update(delta);
     }
 }
 

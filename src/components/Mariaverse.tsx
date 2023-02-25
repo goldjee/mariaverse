@@ -83,18 +83,19 @@ const Mariaverse: React.FC = () => {
             const timeNow = Date.now();
             const deltaTime = timeNow - lastRenderTimeRef.current;
 
-            void universeStore.universe.update(deltaTime);
+            void universeStore.update(deltaTime);
 
             // rendering
             clearBackground(context);
-            for (const particle of universeStore.universe.getParticles()) {
+            const particles = universeStore.particles;
+            for (const particle of particles) {
                 drawParticle(context, particle);
             }
 
             lastRenderTimeRef.current = timeNow;
         }
         animationFrameRequestRef.current = requestAnimationFrame(renderFrame);
-    }, [clearBackground, drawParticle, universeStore.universe]);
+    }, [clearBackground, drawParticle, universeStore]);
 
     useEffect(() => {
         setCanvasDimensions();
