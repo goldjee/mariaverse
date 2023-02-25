@@ -1,4 +1,4 @@
-import { rnd, sign } from '../utils';
+import { rnd, sign } from '../../src/engine/utils';
 
 test('Random values', () => {
     const RUN_COUNT = 1e4;

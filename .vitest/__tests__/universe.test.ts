@@ -1,8 +1,8 @@
-import Attractor from '../Attractor';
-import { Config } from '../Config';
-import { particleTypes } from '../Particle';
-import Universe from '../Universe';
-import Vector from '../Vector';
+import Attractor from '../../src/engine/Attractor';
+import { Config } from '../../src/engine/Config';
+import { particleTypes } from '../../src/engine/Particle';
+import Universe from '../../src/engine/Universe';
+import Vector from '../../src/engine/Vector';
 
 const config = {
     sizeX: 18000,

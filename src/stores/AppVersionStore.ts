@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx';
-import GitInfo from 'react-git-info/macro';
 
 class AppVersionStore {
     private _appHash: string;
@@ -13,11 +12,10 @@ class AppVersionStore {
     }
 
     constructor() {
-        const gitInfo = GitInfo();
-        this._appHash = gitInfo.commit.shortHash;
+        this._appHash = import.meta.env.VITE_HASH || 'unknown_commit';
         const savedAppHash = this.loadAppInfoParameter('app_hash');
 
-        this._appVersion = process.env.REACT_APP_VERSION || 'dev';
+        this._appVersion = import.meta.env.VITE_VERSION || 'dev';
         const savedAppVersion = this.loadAppInfoParameter('app_version');
 
         if (

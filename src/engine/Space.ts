@@ -82,7 +82,7 @@ class Space {
                         sector.neighbors.push(neighbor);
                 }
             }
-            sector.neighbors = _.uniq(sector.neighbors);
+            if (sector.neighbors) sector.neighbors = _.uniq(sector.neighbors);
         });
     }
 

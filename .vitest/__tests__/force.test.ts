@@ -1,5 +1,5 @@
-import getForce, { a1, a2, ed, fd, m, n, sd } from '../force';
-import Vector, { distance } from '../Vector';
+import getForce, { a1, a2, ed, fd, m, n, sd } from '../../src/engine/force';
+import Vector, { distance } from '../../src/engine/Vector';
 
 test('Parameters validity', () => {
     expect(ed).toBeGreaterThan(1);

@@ -1,4 +1,4 @@
-import Vector, { distance, sum } from '../Vector';
+import Vector, { distance, sum } from '../../src/engine/Vector';
 
 test('Copy', () => {
     const vec = new Vector(0, 0);

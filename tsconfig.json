@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ESNext",
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "ESNext"
     ],
-    "allowJs": true,
+    "types": ["vitest/globals"],
+    "allowJs": false,
     "skipLibCheck": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -24,5 +25,6 @@
   },
   "include": [
     "src"
-  ]
+, ".vitest/__tests__"  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

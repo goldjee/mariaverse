@@ -1,5 +1,5 @@
-import Attractor, { exclude, merge } from '../Attractor';
-import Vector from '../Vector';
+import Attractor, { exclude, merge } from '../../src/engine/Attractor';
+import Vector from '../../src/engine/Vector';
 
 const positionA = new Vector(0, 0);
 const positionB = new Vector(100, 100);
