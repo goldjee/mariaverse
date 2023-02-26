@@ -5,7 +5,7 @@ import { Group, Stack, Text, Title } from '@mantine/core';
 import { GiWeight } from 'react-icons/gi';
 
 import { ParticleProperties, ParticleType } from '../../../engine/Particle';
-import ConfigEntry from '../ConfigEntry';
+import ConfigEntry from '../../config_entries/ConfigEntry';
 import AffinityView from './AffinityView';
 
 interface Props extends ParticleProperties {

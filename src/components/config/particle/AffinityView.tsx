@@ -4,7 +4,7 @@ import { Group, Text } from '@mantine/core';
 
 import { ParticleType } from '../../../engine/Particle';
 import Circle from '../../Circle';
-import ConfigEntry from '../ConfigEntry';
+import ConfigEntry from '../../config_entries/ConfigEntry';
 
 interface Props {
     typeA: ParticleType;

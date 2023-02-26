@@ -146,7 +146,7 @@ class Universe {
 
             // console.log(`Particles total: ${this.getParticles().length}`);
 
-            if (this.config.driftPeriod && this.config.driftPeriod > 0)
+            if (this.config.driftPeriod > 0)
                 if (this.timeSinceLastDrift >= this.config.driftPeriod) {
                     this.driftParticleProperties();
                     this.timeSinceLastDrift = 0;

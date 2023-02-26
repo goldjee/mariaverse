@@ -9,7 +9,7 @@ export interface Config {
     massMax: number;
     affinityMin: number;
     affinityMax: number;
-    driftPeriod?: number; // milliseconds
+    driftPeriod: number; // milliseconds
 
     wallAffinity: number;
 

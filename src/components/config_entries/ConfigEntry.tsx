@@ -10,14 +10,14 @@ interface Props {
 const ConfigEntry: React.FC<Props> = ({ label, children }) => {
     return (
         <Grid grow align='center'>
-            <Grid.Col span={5}>
+            <Grid.Col sm={5} xs={12}>
                 {React.isValidElement(label) ? (
                     label
                 ) : (
-                    <Text w='40%'>{label}</Text>
+                    <Text w='100%'>{label}</Text>
                 )}
             </Grid.Col>
-            <Grid.Col span={7}>
+            <Grid.Col sm={7} xs={12}>
                 <Box>{children}</Box>
             </Grid.Col>
         </Grid>
