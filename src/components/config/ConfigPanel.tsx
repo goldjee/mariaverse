@@ -1,8 +1,22 @@
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { Stack, Title, Card, Group, ActionIcon, Tooltip } from '@mantine/core';
-import { BsArrowClockwise, BsWind, BsArrowLeftRight } from 'react-icons/bs';
+import {
+    Stack,
+    Title,
+    Card,
+    Group,
+    ActionIcon,
+    Tooltip,
+    Drawer,
+    ScrollArea,
+} from '@mantine/core';
+import {
+    BsArrowClockwise,
+    BsWind,
+    BsArrowLeftRight,
+    BsFillGearFill,
+} from 'react-icons/bs';
 
 import { Config } from '../../engine/Config';
 import { useStore } from '../../stores/stores';
@@ -17,6 +31,7 @@ import Affinity from '../config_entries/Affinity';
 import ParticlePropertyDrift from '../config_entries/ParticlePropertyDrift';
 
 const ConfigPanel: React.FC = () => {
+    const [opened, setOpened] = useState(false);
     const {
         universeStore: {
             config,
@@ -75,67 +90,89 @@ const ConfigPanel: React.FC = () => {
     }, [repopulate, setParticleProperties]);
 
     return (
-        <Stack align='flex-start' justify='flex-start'>
-            <Card w='100%'>
-                <Stack>
-                    <Group position='apart'>
-                        <Title order={5}>Свойства вселенной</Title>
-                        <Tooltip label='Сбросить настройки'>
-                            <ActionIcon
-                                onClick={reset}
-                                color='red'
-                                variant='outline'
-                            >
-                                <BsArrowClockwise />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                    <LightSpeed onChange={onChange} />
-                    <DistanceCap onChange={onChange} />
-                    <AsymmerticInteractions onChange={onChange} />
-                    <Viscosity onChange={onChange} />
-                </Stack>
-            </Card>
+        <>
+            <Tooltip label='Настройки симуляции'>
+                <ActionIcon
+                    onClick={() => setOpened(true)}
+                    color='blue'
+                    variant='filled'
+                >
+                    <BsFillGearFill />
+                </ActionIcon>
+            </Tooltip>
+            <Drawer
+                opened={opened}
+                onClose={() => setOpened(false)}
+                title='Настройки симуляции'
+                padding='xl'
+                size='xl'
+                position='right'
+            >
+                <ScrollArea style={{ height: '87vh' }}>
+                    <Stack align='flex-start' justify='flex-start'>
+                        <Card w='100%'>
+                            <Stack>
+                                <Group position='apart'>
+                                    <Title order={5}>Свойства вселенной</Title>
+                                    <Tooltip label='Сбросить настройки'>
+                                        <ActionIcon
+                                            onClick={reset}
+                                            color='red'
+                                            variant='outline'
+                                        >
+                                            <BsArrowClockwise />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                </Group>
+                                <LightSpeed onChange={onChange} />
+                                <DistanceCap onChange={onChange} />
+                                <AsymmerticInteractions onChange={onChange} />
+                                <Viscosity onChange={onChange} />
+                            </Stack>
+                        </Card>
 
-            <Card w='100%'>
-                <Stack>
-                    <Group position='apart'>
-                        <Title order={5}>Частицы</Title>
-                        <Tooltip label='Пересоздать'>
-                            <ActionIcon
-                                onClick={resetParticles}
-                                color='blue'
-                                variant='filled'
-                            >
-                                <BsWind />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                    <ParticleCount onChange={onChange} />
-                    <Mass onChange={onChange} />
-                    <Affinity onChange={onChange} />
-                    <ParticlePropertyDrift onChange={onChange} />
-                </Stack>
-            </Card>
+                        <Card w='100%'>
+                            <Stack>
+                                <Group position='apart'>
+                                    <Title order={5}>Частицы</Title>
+                                    <Tooltip label='Пересоздать'>
+                                        <ActionIcon
+                                            onClick={resetParticles}
+                                            color='blue'
+                                            variant='filled'
+                                        >
+                                            <BsWind />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                </Group>
+                                <ParticleCount onChange={onChange} />
+                                <Mass onChange={onChange} />
+                                <Affinity onChange={onChange} />
+                                <ParticlePropertyDrift onChange={onChange} />
+                            </Stack>
+                        </Card>
 
-            <Card w='100%'>
-                <Stack>
-                    <Group position='apart'>
-                        <Title order={5}>Свойства частиц</Title>
-                        <Tooltip label='Сгенерировать новые'>
-                            <ActionIcon
-                                onClick={resetParticleProperties}
-                                color='blue'
-                                variant='filled'
-                            >
-                                <BsArrowLeftRight />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                    {particlePropertiesViews}
-                </Stack>
-            </Card>
-        </Stack>
+                        <Card w='100%'>
+                            <Stack>
+                                <Group position='apart'>
+                                    <Title order={5}>Свойства частиц</Title>
+                                    <Tooltip label='Сгенерировать новые'>
+                                        <ActionIcon
+                                            onClick={resetParticleProperties}
+                                            color='blue'
+                                            variant='filled'
+                                        >
+                                            <BsArrowLeftRight />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                </Group>
+                                {particlePropertiesViews}
+                            </Stack>
+                        </Card>
+                    </Stack>
+                </ScrollArea>
+            </Drawer>
+        </>
     );
 };
 

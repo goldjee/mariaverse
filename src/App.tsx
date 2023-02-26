@@ -2,12 +2,12 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import {
     AppShell,
-    Grid,
     Group,
     Header,
     Stack,
     Title,
     Image,
+    Highlight,
 } from '@mantine/core';
 
 import Mariaverse from './components/Mariaverse';
@@ -22,27 +22,33 @@ const App: React.FC = () => {
             padding='md'
             header={
                 <Header height={60} p='xs'>
-                    <Group spacing='xs'>
-                        <Image src={logo} width={40} />
-                        <Group spacing='xs' align='baseline'>
-                            <Title>Mariaverse</Title>
-                            <AppVersion />
+                    <Group position='apart' w='100%'>
+                        <Group spacing='xs'>
+                            <Image src={logo} width={40} />
+                            <Group spacing='xs' align='baseline'>
+                                <Title>Mariaverse</Title>
+                                <AppVersion />
+                            </Group>
                         </Group>
+                        <ConfigPanel />
                     </Group>
                 </Header>
             }
         >
-            <Grid h='100%'>
-                <Grid.Col lg={8} md={12}>
-                    <Stack>
-                        <Mariaverse />
-                        <About />
-                    </Stack>
-                </Grid.Col>
-                <Grid.Col lg={4} md={12}>
-                    <ConfigPanel />
-                </Grid.Col>
-            </Grid>
+            <Stack w='100%'>
+                <Title order={3}>
+                    <Highlight
+                        highlight={['Mariaverse']}
+                        highlightStyles={{ background: 'none' }}
+                        variant='gradient'
+                    >
+                        Mariaverse - это удивительный в своей простоте симулятор
+                        маленькой вселенной
+                    </Highlight>
+                </Title>
+                <Mariaverse />
+                <About />
+            </Stack>
         </AppShell>
     );
 };
