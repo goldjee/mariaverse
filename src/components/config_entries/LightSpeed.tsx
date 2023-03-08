@@ -1,12 +1,14 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { NumberInput } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '../../stores/stores';
 import ConfigEntry from './ConfigEntry';
 import ConcreteConfigEntryProps from './ConcreteConfigEntryProps';
 
 const LightSpeed: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
+    const { t } = useTranslation();
     const {
         universeStore: {
             config: { velocityCap },
@@ -14,7 +16,7 @@ const LightSpeed: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
     } = useStore();
 
     return (
-        <ConfigEntry label='Скорость света'>
+        <ConfigEntry label={t('velocity_cap')}>
             <NumberInput
                 min={0}
                 value={velocityCap}

@@ -1,12 +1,14 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Group, NumberInput } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '../../stores/stores';
 import ConfigEntry from './ConfigEntry';
 import ConcreteConfigEntryProps from './ConcreteConfigEntryProps';
 
 const ParticleCount: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
+    const { t } = useTranslation();
     const {
         universeStore: {
             config: { particleCountMax, particleCountMin },
@@ -14,10 +16,10 @@ const ParticleCount: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
     } = useStore();
 
     return (
-        <ConfigEntry label='Количество частиц'>
+        <ConfigEntry label={t('particle_count')}>
             <Group position='left' grow>
                 <NumberInput
-                    label='мин'
+                    label={t('min')}
                     min={0}
                     max={particleCountMax}
                     value={particleCountMin}
@@ -26,7 +28,7 @@ const ParticleCount: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
                     w='50%'
                 />
                 <NumberInput
-                    label='макс'
+                    label={t('max')}
                     min={particleCountMin}
                     max={2000}
                     value={particleCountMax}

@@ -5,8 +5,10 @@ import { Slider } from '@mantine/core';
 import { useStore } from '../../stores/stores';
 import ConfigEntry from './ConfigEntry';
 import ConcreteConfigEntryProps from './ConcreteConfigEntryProps';
+import { useTranslation } from 'react-i18next';
 
 const Viscosity: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
+    const { t } = useTranslation();
     const {
         universeStore: {
             config: { viscosity },
@@ -14,7 +16,7 @@ const Viscosity: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
     } = useStore();
 
     return (
-        <ConfigEntry label='Вязкость среды'>
+        <ConfigEntry label={t('viscosity')}>
             <Slider
                 step={1e-1}
                 min={1e-9}

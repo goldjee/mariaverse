@@ -17,6 +17,7 @@ import {
     BsArrowLeftRight,
     BsFillGearFill,
 } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 
 import { Config } from '../../engine/Config';
 import { useStore } from '../../stores/stores';
@@ -31,6 +32,7 @@ import Affinity from '../config_entries/Affinity';
 import ParticlePropertyDrift from '../config_entries/ParticlePropertyDrift';
 
 const ConfigPanel: React.FC = () => {
+    const { t } = useTranslation();
     const [opened, setOpened] = useState(false);
     const {
         universeStore: {
@@ -91,7 +93,7 @@ const ConfigPanel: React.FC = () => {
 
     return (
         <>
-            <Tooltip label='Настройки симуляции'>
+            <Tooltip label={t('settings')}>
                 <ActionIcon
                     onClick={() => setOpened(true)}
                     color='blue'
@@ -103,7 +105,7 @@ const ConfigPanel: React.FC = () => {
             <Drawer
                 opened={opened}
                 onClose={() => setOpened(false)}
-                title='Настройки симуляции'
+                title={t('settings')}
                 padding='xl'
                 size='xl'
                 position='right'
@@ -113,8 +115,10 @@ const ConfigPanel: React.FC = () => {
                         <Card w='100%'>
                             <Stack>
                                 <Group position='apart'>
-                                    <Title order={5}>Свойства вселенной</Title>
-                                    <Tooltip label='Сбросить настройки'>
+                                    <Title order={5}>
+                                        {t('universe_properties')}
+                                    </Title>
+                                    <Tooltip label={t('reset')}>
                                         <ActionIcon
                                             onClick={reset}
                                             color='red'
@@ -134,8 +138,8 @@ const ConfigPanel: React.FC = () => {
                         <Card w='100%'>
                             <Stack>
                                 <Group position='apart'>
-                                    <Title order={5}>Частицы</Title>
-                                    <Tooltip label='Пересоздать'>
+                                    <Title order={5}>{t('particles')}</Title>
+                                    <Tooltip label={t('recreate')}>
                                         <ActionIcon
                                             onClick={resetParticles}
                                             color='blue'
@@ -155,8 +159,10 @@ const ConfigPanel: React.FC = () => {
                         <Card w='100%'>
                             <Stack>
                                 <Group position='apart'>
-                                    <Title order={5}>Свойства частиц</Title>
-                                    <Tooltip label='Сгенерировать новые'>
+                                    <Title order={5}>
+                                        {t('particle_properties')}
+                                    </Title>
+                                    <Tooltip label={t('generate_properties')}>
                                         <ActionIcon
                                             onClick={resetParticleProperties}
                                             color='blue'

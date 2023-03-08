@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Group, Text } from '@mantine/core';
 
 import { ParticleType } from '../../../engine/Particle';
-import Circle from '../../Circle';
+import Circle from './Circle';
 import ConfigEntry from '../../config_entries/ConfigEntry';
 
 interface Props {

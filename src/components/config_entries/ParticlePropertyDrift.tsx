@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Group, NumberInput, Switch } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '../../stores/stores';
 import ConfigEntry from './ConfigEntry';
@@ -10,6 +11,7 @@ import { DEFAULT_CONFIG } from '../../engine/Config';
 const ParticlePropertyDrift: React.FC<ConcreteConfigEntryProps> = ({
     onChange,
 }) => {
+    const { t } = useTranslation();
     const {
         universeStore: {
             config: { driftPeriod },
@@ -17,7 +19,7 @@ const ParticlePropertyDrift: React.FC<ConcreteConfigEntryProps> = ({
     } = useStore();
 
     return (
-        <ConfigEntry label='Дрифт свойств (сек.)'>
+        <ConfigEntry label={t('drift_period')}>
             <Group position='left' grow>
                 <Switch
                     checked={!!driftPeriod && driftPeriod !== 0}

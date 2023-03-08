@@ -1,12 +1,14 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Group, NumberInput } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '../../stores/stores';
 import ConfigEntry from './ConfigEntry';
 import ConcreteConfigEntryProps from './ConcreteConfigEntryProps';
 
 const Mass: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
+    const { t } = useTranslation();
     const {
         universeStore: {
             config: { massMax, massMin },
@@ -14,10 +16,10 @@ const Mass: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
     } = useStore();
 
     return (
-        <ConfigEntry label='Масса частицы'>
+        <ConfigEntry label={t('mass')}>
             <Group position='left' grow>
                 <NumberInput
-                    label='мин'
+                    label={t('min')}
                     min={0}
                     max={massMax}
                     value={massMin}
@@ -27,7 +29,7 @@ const Mass: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
                     w='50%'
                 />
                 <NumberInput
-                    label='макс'
+                    label={t('max')}
                     min={massMin}
                     max={2}
                     value={massMax}

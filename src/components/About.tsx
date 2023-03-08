@@ -1,30 +1,25 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Anchor, Card, Stack, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 const About: React.FC = () => {
+    const { t } = useTranslation();
+
     return (
         <Card>
             <Stack>
                 <Text>
-                    Как-то летом я серфил Youtube и наткнулся на очень занятное{' '}
+                    {t('about_p1') + ' '}
                     <Anchor
                         href='https://www.youtube.com/watch?v=0Kx4Y9TVMGg'
                         target='_blank'
                     >
-                        видео
+                        {t('about_p2')}
                     </Anchor>
-                    . Автор поделился необычной идеей, которую я долгое время
-                    хотел реализовать. Спасибо, Brainxyz.
+                    . {t('about_p3')}
                 </Text>
-                <Text>
-                    Mariaverse - вселенная, которую населяют маленькие частички
-                    разных цветов. Цвета относятся друг к другу по-разному.
-                    Одному цвету может нравиться другой, и тогда он будет к нему
-                    притягиваться. А может быть и наоборот. Частички кружатся в
-                    вальсе этих простых взаимодействий, и образуют необычные
-                    движущиеся картины, очень похожие на живые существа.
-                </Text>
+                <Text>{t('about_p4')}</Text>
             </Stack>
         </Card>
     );

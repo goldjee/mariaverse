@@ -1,12 +1,14 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Group, NumberInput } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '../../stores/stores';
 import ConfigEntry from './ConfigEntry';
 import ConcreteConfigEntryProps from './ConcreteConfigEntryProps';
 
 const Affinity: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
+    const { t } = useTranslation();
     const {
         universeStore: {
             config: { affinityMax, affinityMin },
@@ -14,10 +16,10 @@ const Affinity: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
     } = useStore();
 
     return (
-        <ConfigEntry label='Тяга к соседям'>
+        <ConfigEntry label={t('affinity')}>
             <Group position='left' grow>
                 <NumberInput
-                    label='мин'
+                    label={t('min')}
                     min={-100}
                     max={affinityMax}
                     value={affinityMin}
@@ -27,7 +29,7 @@ const Affinity: React.FC<ConcreteConfigEntryProps> = ({ onChange }) => {
                     w='50%'
                 />
                 <NumberInput
-                    label='макс'
+                    label={t('max')}
                     min={affinityMin}
                     max={100}
                     value={affinityMax}

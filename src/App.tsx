@@ -9,7 +9,9 @@ import {
     Image,
     Highlight,
 } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
+import './locale/i18n';
 import Mariaverse from './components/Mariaverse';
 import ConfigPanel from './components/config/ConfigPanel';
 import About from './components/About';
@@ -17,6 +19,8 @@ import logo from './logo.svg';
 import AppVersion from './components/AppVersion';
 
 const App: React.FC = () => {
+    const { t } = useTranslation();
+
     return (
         <AppShell
             padding='md'
@@ -42,8 +46,7 @@ const App: React.FC = () => {
                         highlightStyles={{ background: 'none' }}
                         variant='gradient'
                     >
-                        Mariaverse - это удивительный в своей простоте симулятор
-                        маленькой вселенной
+                        {t('title')}
                     </Highlight>
                 </Title>
                 <Mariaverse />

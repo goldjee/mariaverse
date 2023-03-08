@@ -1,0 +1,26 @@
+{
+    "translation": {
+        "title": "Mariaverse is an amazingly simple yet complex simulator of a tiny universe",
+        "about_p1": "Once in the summer I was surfing YouTube and stumbled upon an interesting",
+        "about_p2": "video",
+        "about_p3": "The author has shared an amazing idea, which I have been wanting to implement for quite a long time. Thank you, Brainxyz.",
+        "about_p4": "Mariaverse is a universe which is inhabited by small particles of various colors. The colors treat each other differently. One of them may like another one, and such prticle will be attracted to it. Or it could dislike its counterpart and repel from it. The particles whirl in the waltz of these simple interactions and form unusual moving pictures looking like living creatures.",
+        "settings": "Simulation settings",
+        "universe_properties": "Universe properties",
+        "reset": "Reset to defaults",
+        "particles": "Particles",
+        "recreate": "Recreate",
+        "particle_properties": "Particle properties",
+        "generate_properties": "Regenerate",
+        "affinity": "Affinity",
+        "min": "min",
+        "max": "max",
+        "asymmetric": "Asymmetric interactions",
+        "distance_cap": "Interaction distance limit",
+        "velocity_cap": "Speed of light",
+        "viscosity": "Viscosity",
+        "mass": "Mass",
+        "particle_count": "Count",
+        "drift_period": "Property drift, s"
+    }
+}
