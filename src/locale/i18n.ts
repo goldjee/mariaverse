@@ -18,11 +18,9 @@ const resources = {
     ru: ru,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as { [key: Language]: any };
-console.log(resources);
 
 void i18n.use(initReactI18next).init({
     resources,
-    debug: true,
     lng: language,
 
     interpolation: {
