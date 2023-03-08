@@ -29,7 +29,7 @@ export interface Config {
 
 export const DEFAULT_CONFIG = {
     sizeX: 18000,
-    sizeY: 8000,
+    sizeY: 6000,
 
     particleCountMin: 500,
     particleCountMax: 500,
