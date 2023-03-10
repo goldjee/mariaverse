@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import { useTranslation } from 'react-i18next';
+
 import { Particle } from '../engine/Particle';
 import Vector from '../engine/Vector';
 import { useStore } from '../stores/stores';
@@ -20,6 +22,7 @@ const Mariaverse: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const lastRenderTimeRef = useRef<number>(Date.now());
     const animationFrameRequestRef = useRef<number | null>(null);
+    const { t } = useTranslation();
 
     const setCanvasDimensions = useCallback(() => {
         if (parent.current) {
@@ -115,8 +118,7 @@ const Mariaverse: React.FC = () => {
     return (
         <div ref={parent} style={{ width: '100%', maxWidth: '100vw' }}>
             <canvas ref={canvasRef} width={size.width} height={size.height}>
-                Прости, но похоже, в твоем браузере не поддерживаются нужные
-                технологии. Попробуй Chrome или Firefox.
+                {t('canvas_error')}
             </canvas>
         </div>
     );

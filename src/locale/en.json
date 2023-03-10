@@ -21,6 +21,7 @@
         "viscosity": "Viscosity",
         "mass": "Mass",
         "particle_count": "Count",
-        "drift_period": "Property drift, s"
+        "drift_period": "Property drift, s",
+        "canvas_error": "Sorry, but it seems that your web browser does not support the required technology. Try opening this page in Chrome or Firefox."
     }
 }
